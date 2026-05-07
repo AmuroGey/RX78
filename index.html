@@ -994,40 +994,49 @@ function buildDetailPanel() {
     // Drag anywhere on the photo viewer to spin the carousel
     let dragSpinActive = false;
     let dragSpinLastX = 0;
+    let dragSpinStartX = 0;
+    const DRAG_THRESHOLD = 6; // px before drag activates
 
     const onViewerDragStart = (e) => {
-      // Don't steal from slider or zoom interactions
       if (e.target.closest("#carousel-track") || e.target.closest(".carousel-zoom")) return;
-      e.preventDefault(); // prevent image drag / text selection
-      dragSpinActive = true;
-      dragSpinLastX = e.touches ? e.touches[0].clientX : e.clientX;
-      pauseCarousel();
-      viewer.style.cursor = "grabbing";
+      // Don't preventDefault here — let taps on shots fire naturally
+      dragSpinActive = false; // not active yet, waiting for threshold
+      dragSpinStartX = e.touches ? e.touches[0].clientX : e.clientX;
+      dragSpinLastX = dragSpinStartX;
     };
     const onViewerDragMove = (e) => {
-      if (!dragSpinActive) return;
-      e.preventDefault();
       const x = e.touches ? e.touches[0].clientX : e.clientX;
       const dx = x - dragSpinLastX;
+      const totalDx = Math.abs(x - dragSpinStartX);
+
+      // Only activate drag once threshold is crossed
+      if (!dragSpinActive) {
+        if (totalDx < DRAG_THRESHOLD) return;
+        dragSpinActive = true;
+        pauseCarousel();
+        viewer.style.cursor = "grabbing";
+      }
+
+      e.preventDefault();
       dragSpinLastX = x;
       carouselAngle += dx * 0.5;
       const pct = ((carouselAngle % 360) + 360) % 360 / 360;
       updateSliderUI(pct);
     };
     const onViewerDragEnd = () => {
-      if (!dragSpinActive) return;
+      if (dragSpinActive) {
+        viewer.style.cursor = "grab";
+        scheduleResume();
+      }
       dragSpinActive = false;
-      viewer.style.cursor = "grab";
-      scheduleResume();
     };
 
     viewer.addEventListener("mousedown", onViewerDragStart);
-    viewer.addEventListener("touchstart", onViewerDragStart, { passive: false });
+    viewer.addEventListener("touchstart", onViewerDragStart, { passive: true });
     window.addEventListener("mousemove", onViewerDragMove);
     window.addEventListener("touchmove", onViewerDragMove, { passive: false });
     window.addEventListener("mouseup", onViewerDragEnd);
     window.addEventListener("touchend", onViewerDragEnd);
-    // Prevent image/element dragging inside viewer
     viewer.addEventListener("dragstart", (e) => e.preventDefault());
   }
 
