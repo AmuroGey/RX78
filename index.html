@@ -21,8 +21,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 /* GUNDAM BG */
 #gundam-bg{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity 1.0s ease;overflow:hidden;}
 #gundam-bg img{height:100vh;width:auto;max-width:none;object-fit:contain;display:block;flex-shrink:0;}
-#gundam-inactive{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-#gundam-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1.4s ease;}
+#gundam-inactive{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:8vh;}
+#gundam-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:8vh;opacity:0;transition:opacity 1.4s ease;}
 #gundam-active.visible{opacity:1;}
 #gundam-active.pulse{animation:gundamPulse 3.5s ease-in-out infinite;}
 @keyframes gundamPulse{0%{opacity:1;}15%{opacity:0.7;}20%{opacity:0.9;}25%{opacity:0.65;}40%{opacity:1;}60%{opacity:0.75;}65%{opacity:0.95;}70%{opacity:0.72;}100%{opacity:1;}}
@@ -163,7 +163,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:260px;--card-h:360px;}
+.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:260px;--card-h:360px;cursor:grab;}
+.photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
 .photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.6) 0%,transparent 28%,transparent 72%,rgba(0,0,0,0.6) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
@@ -982,6 +983,41 @@ function buildDetailPanel() {
       updateSliderUI(pct);
       scheduleResume();
     }, { passive: false });
+
+    // Drag anywhere on the photo viewer to spin the carousel
+    let dragSpinActive = false;
+    let dragSpinLastX = 0;
+
+    const onViewerDragStart = (e) => {
+      // Don't steal from slider or zoom interactions
+      if (e.target.closest("#carousel-track") || e.target.closest(".carousel-zoom")) return;
+      dragSpinActive = true;
+      dragSpinLastX = e.touches ? e.touches[0].clientX : e.clientX;
+      pauseCarousel();
+      viewer.style.cursor = "grabbing";
+    };
+    const onViewerDragMove = (e) => {
+      if (!dragSpinActive) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const dx = x - dragSpinLastX;
+      dragSpinLastX = x;
+      carouselAngle += dx * 0.5;
+      const pct = ((carouselAngle % 360) + 360) % 360 / 360;
+      updateSliderUI(pct);
+    };
+    const onViewerDragEnd = () => {
+      if (!dragSpinActive) return;
+      dragSpinActive = false;
+      viewer.style.cursor = "";
+      scheduleResume();
+    };
+
+    viewer.addEventListener("mousedown", onViewerDragStart);
+    viewer.addEventListener("touchstart", onViewerDragStart, { passive: true });
+    document.addEventListener("mousemove", onViewerDragMove);
+    document.addEventListener("touchmove", onViewerDragMove, { passive: true });
+    document.addEventListener("mouseup", onViewerDragEnd);
+    document.addEventListener("touchend", onViewerDragEnd);
   }
 
   // Show placeholder carousel immediately — rebuilds as real shots probe in
