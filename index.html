@@ -69,8 +69,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 #boot-scan{position:absolute;left:0;right:0;height:2px;top:0;background:linear-gradient(90deg,transparent,var(--amber),transparent);box-shadow:0 0 16px rgba(232,160,32,0.7);opacity:0;}
 #boot-scan.go{animation:bootScan 1.6s ease-in-out forwards;}
 @keyframes bootScan{0%{top:0;opacity:0;}5%{opacity:1;}95%{opacity:1;}100%{top:100%;opacity:0;}}
-#boot-lines{display:flex;flex-direction:column;gap:10px;}
-.boot-line{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:4px;color:var(--amber);opacity:0;transform:translateY(6px);transition:opacity 0.35s ease,transform 0.35s ease;text-shadow:0 0 10px rgba(232,160,32,0.5);}
+#boot-lines{display:flex;flex-direction:column;gap:16px;}
+.boot-line{font-family:'Share Tech Mono',monospace;font-size:17px;letter-spacing:6px;color:var(--amber);opacity:0;transform:translateY(6px);transition:opacity 0.35s ease,transform 0.35s ease;text-shadow:0 0 10px rgba(232,160,32,0.5);}
 .boot-line.show{opacity:1;transform:translateY(0);}
 .boot-line.past{color:var(--text-dim);text-shadow:none;opacity:0.6;}
 
@@ -111,7 +111,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 
 /* GRADE GROUP */
 .grade-group{margin-bottom:6px;}
-.grade-header{display:flex;align-items:center;gap:12px;padding:10px 32px;background:rgba(0,0,0,0.65);border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.grade-header{display:flex;align-items:center;gap:12px;padding:10px 32px;background:rgba(0,0,0,0.65);border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;border-left:3px solid transparent;}
 .grade-header:hover{background:rgba(15,21,32,0.85);}
 .grade-badge{font-family:'Orbitron',monospace;font-size:11px;font-weight:900;letter-spacing:2px;padding:3px 10px;border:1px solid;}
 .grade-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim);}
@@ -608,9 +608,9 @@ function renderRegistry() {
     const c = GRADE_COLOR[grade];
     const header = document.createElement("div");
     header.className = "grade-header";
+    header.style.borderLeftColor = c;
     header.innerHTML = `
-      <span class="grade-badge" style="color:${c};border-color:${c};background:${c}12">${grade}</span>
-      <span class="grade-title">${GRADE_NAMES[grade]||grade}</span>
+      <span class="grade-title" style="color:${c};letter-spacing:4px;font-size:11px;">${GRADE_NAMES[grade]||grade}</span>
       <span class="grade-n">${items.length} KIT${items.length!==1?"S":""}</span>
       <span class="grade-chevron${collapsed[grade]?"":" open"}">&#9658;</span>
     `;
