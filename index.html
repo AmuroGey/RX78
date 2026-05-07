@@ -234,9 +234,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   border:1px solid var(--amber);
   overflow:hidden;
   cursor:default;
-  aspect-ratio:auto;
+  display:flex;align-items:center;justify-content:center;
 }
-.carousel-zoom-card img{height:100%;width:auto;object-fit:contain;display:block;}
+.carousel-zoom-card img{max-height:100%;max-width:100%;width:auto;height:auto;object-fit:contain;display:block;margin:auto;}
 .carousel-zoom-close{
   position:absolute;
   top:12px;right:12px;
