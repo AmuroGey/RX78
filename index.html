@@ -158,22 +158,93 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:8px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:var(--border);border-bottom:1px solid var(--border);height:320px;}
-.photo-panel{position:relative;background:#050810;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-.photo-panel img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.4s ease;}
-.panel-corner{position:absolute;width:14px;height:14px;border-color:rgba(232,160,32,0.5);border-style:solid;}
+.photo-viewer{position:relative;height:380px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;}
+.photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
+.photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
+.photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.6) 0%,transparent 28%,transparent 72%,rgba(0,0,0,0.6) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
+.photo-viewer-shots{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;z-index:3;pointer-events:none;padding:0 6px;}
+.photo-shot{width:26%;height:115%;display:flex;align-items:flex-end;justify-content:center;position:relative;bottom:-4%;transition:opacity 0.4s ease;}
+.photo-shot img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9));transition:opacity 0.4s ease;}
+.photo-shot-empty{width:37%;height:70%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-size:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;border:1px dashed rgba(255,255,255,0.07);background:rgba(0,0,0,0.25);}
+.panel-corner{position:absolute;width:14px;height:14px;border-color:rgba(232,160,32,0.4);border-style:solid;z-index:4;}
 .panel-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px;}
 .panel-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0;}
-.panel-corner.bl{bottom:32px;left:8px;border-width:0 0 1px 1px;}
-.panel-corner.br{bottom:32px;right:8px;border-width:0 1px 1px 0;}
-.panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;text-align:center;padding:16px;width:100%;height:100%;}
-.carousel-ctrl{position:absolute;bottom:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);display:flex;align-items:center;gap:6px;}
-.carousel-btn{background:none;border:1px solid rgba(232,160,32,0.35);color:rgba(232,160,32,0.6);width:20px;height:20px;cursor:pointer;font-size:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.carousel-btn:hover{border-color:var(--amber);color:var(--amber);}
-.carousel-counter{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(232,160,32,0.55);letter-spacing:1px;flex-shrink:0;min-width:32px;text-align:center;}
-.carousel-track{flex:1;height:2px;background:rgba(255,255,255,0.12);position:relative;cursor:pointer;border-radius:1px;}
-.carousel-fill{height:100%;background:var(--amber);border-radius:1px;transition:width 0.35s ease;}
-.carousel-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;background:var(--amber);border-radius:50%;box-shadow:0 0 6px rgba(232,160,32,0.6);transition:left 0.35s ease;pointer-events:none;}
+.panel-corner.bl{bottom:40px;left:8px;border-width:0 0 1px 1px;}
+.panel-corner.br{bottom:40px;right:8px;border-width:0 1px 1px 0;}
+.panel-empty{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;text-align:center;background:#050810;}
+/* 3D CAROUSEL */
+.carousel-scene{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  z-index:1;
+  overflow:hidden;
+}
+.carousel-ring{
+  position:relative;
+  width:100%;height:100%;
+}
+.carousel-card{
+  position:absolute;
+  width:180px;height:250px;
+  top:50%;left:50%;
+  margin-top:-125px;margin-left:-90px;
+  background:#0a1520;
+  border:1px solid rgba(30,58,95,0.6);
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  will-change:transform,opacity;
+  transform-origin:center center;
+}
+.carousel-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.carousel-card:hover{border-color:rgba(232,160,32,0.7);box-shadow:0 0 20px rgba(232,160,32,0.15);}
+
+/* ZOOMED CARD */
+.carousel-zoom{
+  position:absolute;inset:0;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  transition:background 0.35s ease;
+}
+.carousel-zoom.open{background:rgba(0,0,0,0.75);pointer-events:all;cursor:pointer;}
+.carousel-zoom-card{
+  position:relative;
+  width:70%;height:90%;
+  background:#0a1520;
+  border:1px solid var(--amber);
+  overflow:hidden;
+  transform:scale(0.1);
+  opacity:0;
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+  cursor:default;
+}
+.carousel-zoom.open .carousel-zoom-card{transform:scale(1);opacity:1;}
+.carousel-zoom-card img{width:100%;height:100%;object-fit:contain;}
+.carousel-zoom-close{
+  position:absolute;top:8px;right:8px;
+  background:rgba(0,0,0,0.7);border:1px solid var(--amber);
+  color:var(--amber);width:28px;height:28px;
+  cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;transition:all 0.15s;
+}
+.carousel-zoom-close:hover{background:var(--amber);color:#000;}
+
+/* SLIDER CTRL */
+.carousel-ctrl{
+  position:absolute;bottom:0;left:0;right:0;z-index:6;
+  padding:8px 16px;
+  background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);
+  display:flex;align-items:center;gap:8px;
+}
+.carousel-speed-label{font-family:"Share Tech Mono",monospace;font-size:9px;color:rgba(232,160,32,0.5);letter-spacing:1px;flex-shrink:0;}
+.carousel-track{flex:1;height:3px;background:rgba(255,255,255,0.1);position:relative;border-radius:2px;cursor:grab;}
+.carousel-track:active{cursor:grabbing;}
+.carousel-fill{height:100%;background:var(--amber);border-radius:2px;}
+.carousel-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:var(--amber);border-radius:50%;box-shadow:0 0 8px rgba(232,160,32,0.7);cursor:grab;}
+.carousel-thumb:active{cursor:grabbing;}
+.carousel-count{font-family:"Share Tech Mono",monospace;font-size:9px;color:rgba(232,160,32,0.5);letter-spacing:1px;flex-shrink:0;}
 
 /* FOOTER */
 .rx-footer{border-top:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:40px;background:rgba(0,0,0,0.6);}
@@ -222,8 +293,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .status-desktop{display:none;}
   .status-mobile{display:inline-block;}
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
-  .photo-viewer{height:180px;}
+  .photo-viewer{height:220px;}
   .panel-corner{width:10px;height:10px;}
+  .photo-shot{width:30%;}
   .modal-body{grid-template-columns:1fr;}
   .modal-left{border-right:none;border-bottom:1px solid var(--border);}
   .modal-header{padding:16px;}
@@ -237,8 +309,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 <body>
 
 <div id="gundam-bg">
-  <div id="gundam-inactive"><img src="background/rx78-bg.png" alt="" /></div>
-  <div id="gundam-active"><img src="background/rx78-bg-active.png" alt="" /></div>
+  <div id="gundam-inactive"><img src="https://raw.githubusercontent.com/amurogey/RX78/main/background/rx78-bg.png" alt="" onerror="this.style.display='none'" /></div>
+  <div id="gundam-active"><img src="https://raw.githubusercontent.com/amurogey/RX78/main/background/rx78-bg-active.png" alt="" onerror="this.style.display='none'" /></div>
 </div>
 <div class="rx-scanlines"></div>
 <div class="rx-grid"></div>
@@ -353,9 +425,18 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
       <button class="modal-close" id="modal-close">&#10005;</button>
     </div>
     <div class="photo-viewer" id="photo-viewer">
-      <div class="photo-panel" id="panel-front"></div>
-      <div class="photo-panel" id="panel-back"></div>
-      <div class="photo-panel" id="panel-detail"></div>
+      <!-- Detail carousel — background layer -->
+      <div class="photo-viewer-detail" id="panel-detail"></div>
+      <!-- Vignette overlay -->
+      <div class="photo-viewer-vignette"></div>
+      <!-- Front + Back floating shots -->
+      <div class="photo-viewer-shots">
+        <div class="photo-shot" id="panel-front"></div>
+        <div class="photo-shot" id="panel-back"></div>
+      </div>
+      <!-- Corner brackets -->
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
     </div>
     <div class="modal-body">
       <div class="modal-left">
@@ -405,20 +486,37 @@ let statusFilter = "ALL";
 let searchQuery = "";
 let collapsed = { SD:true, EG:true, HG:true, RG:true, MG:true, PG:true, MEGASIZE:true, MISC:true };
 let currentModal = null;
-let carouselIdx = 0;
-let carouselTimer = null;
 let detailLoaded = [];
 let detailUrls = [];
+let carouselAngle = 0;       // current rotation in degrees
+let carouselSpeed = 0.4;     // degrees per frame (base auto speed)
+let carouselRAF = null;       // requestAnimationFrame handle
+let carouselPaused = false;
+let carouselResumeTimer = null;
+let carouselSliderDragging = false;
+let carouselZoomedUrl = null;
+let carouselZoomedIdx = null;
 
 // ── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
   // Load kits.json
   try {
-    const res = await fetch("kits.json");
+    const res = await fetch("https://raw.githubusercontent.com/amurogey/RX78/main/kits.json");
     kits = await res.json();
   } catch(e) {
-    console.warn("Could not load kits.json, using empty array");
-    kits = [];
+    console.warn("Could not load kits.json, using fallback data");
+    kits = [
+      { id:"hg-revive", grade:"HG", name:"RX-78-2 Gundam", mold:"Revive", variant:"Standard Ver.", year:2015, status:"built", tags:["revive","1:144"], notes:"The 2015 HG Revive is the definitive modern HG take on the RX-78-2." },
+      { id:"hg-g40", grade:"HG", name:"RX-78-2 Gundam", mold:"G40 Industrial Design", variant:"Standard Ver.", year:2019, status:"built", tags:["40th-anniversary","industrial"], notes:"" },
+      { id:"eg-standard", grade:"EG", name:"RX-78-2 Gundam", mold:"Entry Grade", variant:"Standard Ver.", year:2020, status:"built", tags:["entry-grade"], notes:"" },
+      { id:"rg-ver10", grade:"RG", name:"RX-78-2 Gundam", mold:"RG Ver. 1.0", variant:"Standard Ver.", year:2010, status:"built", tags:["first-rg"], notes:"" },
+      { id:"rg-ver20", grade:"RG", name:"RX-78-2 Gundam", mold:"RG Ver. 2.0", variant:"Standard Ver.", year:2024, status:"built", tags:["45th-anniversary"], notes:"" },
+      { id:"mg-ver30", grade:"MG", name:"RX-78-2 Gundam", mold:"Ver. 3.0", variant:"Standard Ver.", year:2013, status:"built", tags:["30th-anniversary"], notes:"" },
+      { id:"mg-verka", grade:"MG", name:"RX-78-2 Gundam", mold:"Ver. Ka", variant:"Standard Ver.", year:2002, status:"built", tags:["katoki","ver-ka"], notes:"" },
+      { id:"pg-unleashed", grade:"PG", name:"RX-78-2 Gundam", mold:"PG Unleashed", variant:"Standard Ver.", year:2020, status:"built", tags:["led","unleashed"], notes:"" },
+      { id:"megasize-standard", grade:"MEGASIZE", name:"RX-78-2 Gundam", mold:"Megasize Model", variant:"Standard Ver.", year:2010, status:"built", tags:["1:48","display"], notes:"" },
+      { id:"sd-bb-senshi", grade:"SD", name:"RX-78-2 Gundam", mold:"BB Senshi", variant:"Standard Ver.", year:1990, status:"built", tags:["bb-senshi","classic"], notes:"" },
+    ];
   }
 
   document.getElementById("kit-count").textContent = kits.length + " KITS";
@@ -666,9 +764,11 @@ function renderRegistry() {
 // ── MODAL ────────────────────────────────────────────────────────────────────
 function openModal(kit) {
   currentModal = kit;
-  carouselIdx = 0;
   detailLoaded = [];
-  if (carouselTimer) clearInterval(carouselTimer);
+  carouselAngle = 0;
+  carouselZoomedUrl = null;
+  carouselZoomedIdx = null;
+  if (carouselRAF) cancelAnimationFrame(carouselRAF);
 
   const c = GRADE_COLOR[kit.grade];
   const sc = STATUS_COLOR[kit.status];
@@ -717,20 +817,28 @@ function buildPhotoViewer(kit) {
 
 function buildStaticPanel(panelId, url) {
   const panel = document.getElementById(panelId);
-  panel.innerHTML = corners();
+  panel.innerHTML = "";
   const img = document.createElement("img");
   img.style.opacity = "0";
+  img.style.maxWidth = "100%";
+  img.style.maxHeight = "100%";
+  img.style.objectFit = "contain";
+  img.style.filter = "drop-shadow(0 8px 32px rgba(0,0,0,0.9))";
   img.onload = () => { img.style.opacity = "1"; };
-  img.onerror = () => { img.remove(); panel.insertAdjacentHTML("afterbegin", emptyHTML()); };
+  img.onerror = () => {
+    img.remove();
+    panel.innerHTML = '<div class="photo-shot-empty"><div style="font-size:16px;opacity:0.2">&#9645;</div><div>NO IMAGE</div></div>';
+  };
   img.src = url;
-  panel.insertBefore(img, panel.firstChild);
+  panel.appendChild(img);
 }
 
 function buildDetailPanel() {
   const panel = document.getElementById("panel-detail");
-  panel.innerHTML = corners();
+  panel.innerHTML = "";
+  if (carouselRAF) cancelAnimationFrame(carouselRAF);
 
-  // Probe images (hidden)
+  // Probe images
   const probeContainer = document.createElement("div");
   probeContainer.style.display = "none";
   let errorCount = 0;
@@ -742,105 +850,250 @@ function buildDetailPanel() {
       if (!detailLoaded.includes(i)) {
         detailLoaded.push(i);
         detailLoaded.sort((a,b) => a-b);
-        updateDetailPanel();
-        if (detailLoaded.length === 2) startCarousel();
+        buildCarousel3D(panel); // rebuild with real photos as they load
       }
     };
-    probe.onerror = () => {
-      errorCount++;
-      // Once all probes have failed or errored and none loaded, show empty state
-      if (errorCount + detailLoaded.length === detailUrls.length && detailLoaded.length === 0) {
-        const dispImg = document.getElementById("detail-display-img");
-        if (dispImg) dispImg.remove();
-        panel.insertAdjacentHTML("afterbegin", emptyHTML());
-      }
-    };
+    probe.onerror = () => { errorCount++; };
     probeContainer.appendChild(probe);
   });
   panel.appendChild(probeContainer);
 
-  // Display image
-  const dispImg = document.createElement("img");
-  dispImg.id = "detail-display-img";
-  dispImg.style.opacity = "0";
-  panel.insertBefore(dispImg, panel.firstChild);
-
-  // Carousel controls (hidden until shots load)
+  // Add carousel controls immediately (hidden until shots load)
   const ctrl = document.createElement("div");
   ctrl.className = "carousel-ctrl";
   ctrl.id = "carousel-ctrl";
   ctrl.style.display = "none";
   ctrl.innerHTML = `
-    <button class="carousel-btn" id="carousel-prev">&#8249;</button>
-    <span class="carousel-counter" id="carousel-counter">01/01</span>
+    <span class="carousel-speed-label">SPIN</span>
     <div class="carousel-track" id="carousel-track">
-      <div class="carousel-fill" id="carousel-fill" style="width:0%"></div>
-      <div class="carousel-thumb" id="carousel-thumb" style="left:0%"></div>
+      <div class="carousel-fill" id="carousel-fill" style="width:50%"></div>
+      <div class="carousel-thumb" id="carousel-thumb" style="left:50%"></div>
     </div>
-    <button class="carousel-btn" id="carousel-next">&#8250;</button>
+    <span class="carousel-count" id="carousel-count"></span>
   `;
   panel.appendChild(ctrl);
 
-  document.getElementById("carousel-prev").addEventListener("click", () => { stepCarousel(-1); });
-  document.getElementById("carousel-next").addEventListener("click", () => { stepCarousel(1); });
-  document.getElementById("carousel-track").addEventListener("click", seekCarousel);
+  // Zoom overlay
+  const zoom = document.createElement("div");
+  zoom.className = "carousel-zoom";
+  zoom.id = "carousel-zoom";
+  zoom.innerHTML = `
+    <div class="carousel-zoom-card" id="carousel-zoom-card">
+      <img id="carousel-zoom-img" src="" alt="" />
+      <button class="carousel-zoom-close" id="carousel-zoom-close">&#10005;</button>
+    </div>
+  `;
+  zoom.addEventListener("click", (e) => {
+    if (e.target === zoom) closeZoom();
+  });
+  panel.appendChild(zoom);
+
+  document.getElementById("carousel-zoom-close").addEventListener("click", closeZoom);
+
+  // Slider drag
+  const track = document.getElementById("carousel-track");
+  const thumb = document.getElementById("carousel-thumb");
+  let dragStart = null;
+  let dragAngle = null;
+
+  const onDragStart = (e) => {
+    e.preventDefault();
+    carouselSliderDragging = true;
+    pauseCarousel();
+  };
+  const onDragMove = (e) => {
+    if (!carouselSliderDragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    // Directly map slider 0-1 to carousel angle 0-360
+    carouselAngle = pct * 360;
+    updateSliderUI(pct);
+  };
+  const onDragEnd = () => {
+    if (!carouselSliderDragging) return;
+    carouselSliderDragging = false;
+    scheduleResume();
+  };
+
+  track.addEventListener("mousedown", (e) => {
+    // Snap immediately on click before drag starts
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    carouselAngle = pct * 360;
+    updateSliderUI(pct);
+    onDragStart(e);
+  });
+  track.addEventListener("touchstart", onDragStart, {passive:false});
+  document.addEventListener("mousemove", onDragMove);
+  document.addEventListener("touchmove", onDragMove, {passive:false});
+  document.addEventListener("mouseup", onDragEnd);
+  document.addEventListener("touchend", onDragEnd);
+
+  // Show placeholder carousel immediately — rebuilds as real shots probe in
+  buildCarousel3D(panel);
 }
 
-function updateDetailPanel() {
-  if (!detailLoaded.length) return;
-  const validUrls = detailLoaded.map(i => detailUrls[i]);
-  const safeIdx = Math.min(carouselIdx, validUrls.length - 1);
-  carouselIdx = safeIdx;
-  const img = document.getElementById("detail-display-img");
-  if (img) {
-    img.src = validUrls[safeIdx];
-    img.style.opacity = "1";
+function getDisplayUrls() {
+  const loaded = detailLoaded.map(i => detailUrls[i]);
+  const MIN = 3;
+  if (loaded.length === 0) {
+    // Return placeholder sentinel values
+    return Array.from({ length: MIN }, (_, i) => ({ placeholder: true, idx: i }));
   }
-  const ctrl = document.getElementById("carousel-ctrl");
-  if (ctrl) ctrl.style.display = validUrls.length > 0 ? "flex" : "none";
-  updateCarouselUI();
+  // Repeat to fill minimum 3 slots
+  const result = [];
+  while (result.length < Math.max(MIN, loaded.length)) result.push(...loaded);
+  return result.slice(0, Math.max(MIN, loaded.length)).map(url => ({ placeholder: false, url }));
 }
 
-function updateCarouselUI() {
-  const total = detailLoaded.length;
-  if (!total) return;
-  const pct = total > 1 ? (carouselIdx / (total - 1)) * 100 : 0;
-  const counter = document.getElementById("carousel-counter");
+function buildCarousel3D(panel) {
+  // Remove old ring if exists
+  const old = document.getElementById("carousel-ring");
+  if (old) old.remove();
+
+  const urls = getDisplayUrls();
+  if (!urls.length) return;
+
+  const count = urls.length;
+  const radius = Math.max(120, count * 42);
+
+  const scene = document.createElement("div");
+  scene.className = "carousel-scene";
+  const ring = document.createElement("div");
+  ring.className = "carousel-ring";
+  ring.id = "carousel-ring";
+
+  urls.forEach((entry, i) => {
+    const card = document.createElement("div");
+    card.className = "carousel-card";
+    card.dataset.idx = i;
+
+    if (entry.placeholder) {
+      // Placeholder card
+      card.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(90,122,154,0.5);">
+          <div style="font-size:22px;opacity:0.25">&#9645;</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;">NO IMAGE</div>
+        </div>`;
+      card.style.cursor = "default";
+    } else {
+      const img = document.createElement("img");
+      img.src = entry.url;
+      img.alt = "";
+      card.appendChild(img);
+      card.addEventListener("click", () => openZoom(entry.url, i));
+    }
+
+    ring.appendChild(card);
+  });
+
+  scene.appendChild(ring);
+  // Insert before controls
+  const ctrl = document.getElementById("carousel-ctrl");
+  panel.insertBefore(scene, ctrl);
+
+  // Show controls + count
+  document.getElementById("carousel-ctrl").style.display = "flex";
+  document.getElementById("carousel-count").textContent = detailLoaded.length > 0 ? detailLoaded.length + " SHOTS" : "NO PHOTOS";
+
+  // Start animation
+  startCarousel3D(count, radius);
+}
+
+function startCarousel3D(count, radius) {
+  if (carouselRAF) cancelAnimationFrame(carouselRAF);
+  const ring = document.getElementById("carousel-ring");
+  if (!ring) return;
+  const angleStep = 360 / count;
+
+  function tick() {
+    if (!carouselPaused || carouselSliderDragging) {
+      carouselAngle += carouselSpeed;
+    }
+
+    Array.from(ring.children).forEach((card, i) => {
+      const cardAngle = ((i * angleStep + carouselAngle) % 360 + 360) % 360;
+      const rad = cardAngle * Math.PI / 180;
+
+      // X position on circle (no Z axis — cards always face forward)
+      const x = Math.sin(rad) * radius;
+      // Depth simulated via scale and opacity only
+      const depth = (Math.cos(rad) + 1) / 2; // 0=back, 1=front
+      const scale = 0.55 + depth * 0.45;     // 0.55 at back, 1.0 at front
+
+      card.style.transform = `translateX(${x}px) scale(${scale})`;
+      card.style.opacity = String(0.2 + depth * 0.8);
+      card.style.zIndex = String(Math.round(depth * 10));
+
+      const isFront = depth > 0.85;
+      card.classList.toggle("is-front", isFront);
+    });
+
+    // Keep slider thumb in sync with rotation
+    const pct = ((carouselAngle % 360) + 360) % 360 / 360;
+    if (!carouselSliderDragging) updateSliderUI(pct);
+
+    carouselRAF = requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function pauseCarousel() {
+  carouselPaused = true;
+  if (carouselResumeTimer) clearTimeout(carouselResumeTimer);
+}
+
+function scheduleResume() {
+  if (carouselResumeTimer) clearTimeout(carouselResumeTimer);
+  carouselResumeTimer = setTimeout(() => {
+    carouselPaused = false;
+  }, 3000);
+}
+
+function updateSliderUI(pct) {
   const fill = document.getElementById("carousel-fill");
   const thumb = document.getElementById("carousel-thumb");
-  if (counter) counter.textContent = `${String(carouselIdx+1).padStart(2,"0")}/${String(total).padStart(2,"0")}`;
-  if (fill) fill.style.width = `${pct}%`;
-  if (thumb) thumb.style.left = `${pct}%`;
+  if (fill) fill.style.width = `${pct * 100}%`;
+  if (thumb) thumb.style.left = `${pct * 100}%`;
 }
 
-function stepCarousel(dir) {
-  if (carouselTimer) clearInterval(carouselTimer);
-  const total = detailLoaded.length;
-  if (!total) return;
-  carouselIdx = (carouselIdx + dir + total) % total;
-  updateDetailPanel();
-  startCarousel();
+function openZoom(url, idx) {
+  pauseCarousel();
+  carouselZoomedUrl = url;
+  carouselZoomedIdx = idx;
+
+  // Fade out front/back shots
+  const front = document.getElementById("panel-front");
+  const back = document.getElementById("panel-back");
+  if (front) front.style.opacity = "0";
+  if (back) back.style.opacity = "0";
+
+  const zoom = document.getElementById("carousel-zoom");
+  const zoomImg = document.getElementById("carousel-zoom-img");
+  if (!zoom || !zoomImg) return;
+  zoomImg.src = url;
+  zoom.classList.add("open");
 }
 
-function seekCarousel(e) {
-  if (carouselTimer) clearInterval(carouselTimer);
-  const total = detailLoaded.length;
-  if (!total) return;
-  const rect = e.currentTarget.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  carouselIdx = Math.round(pct * (total - 1));
-  updateDetailPanel();
-  startCarousel();
+function closeZoom() {
+  const zoom = document.getElementById("carousel-zoom");
+  if (!zoom) return;
+  zoom.classList.remove("open");
+  carouselZoomedUrl = null;
+
+  // Fade front/back shots back in
+  const front = document.getElementById("panel-front");
+  const back = document.getElementById("panel-back");
+  if (front) front.style.opacity = "1";
+  if (back) back.style.opacity = "1";
+
+  scheduleResume();
 }
 
-function startCarousel() {
-  if (carouselTimer) clearInterval(carouselTimer);
-  const total = detailLoaded.length;
-  if (total <= 1) return;
-  carouselTimer = setInterval(() => {
-    carouselIdx = (carouselIdx + 1) % total;
-    updateDetailPanel();
-  }, 3000);
+function stopCarousel() {
+  if (carouselRAF) { cancelAnimationFrame(carouselRAF); carouselRAF = null; }
+  if (carouselResumeTimer) clearTimeout(carouselResumeTimer);
 }
 
 function corners() {
@@ -853,7 +1106,7 @@ function emptyHTML() {
 function closeModal() {
   document.getElementById("modal-bg").classList.remove("open");
   document.body.style.overflow = "";
-  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+  stopCarousel();
   currentModal = null;
 }
 
