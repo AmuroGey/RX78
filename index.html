@@ -937,6 +937,19 @@ function buildDetailPanel() {
   document.addEventListener("mouseup", onDragEnd);
   document.addEventListener("touchend", onDragEnd);
 
+  // Scroll wheel on photo viewer spins the carousel
+  const viewer = document.getElementById("photo-viewer");
+  if (viewer) {
+    viewer.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      carouselAngle += e.deltaY * 0.15;
+      pauseCarousel();
+      const pct = ((carouselAngle % 360) + 360) % 360 / 360;
+      updateSliderUI(pct);
+      scheduleResume();
+    }, { passive: false });
+  }
+
   // Show placeholder carousel immediately — rebuilds as real shots probe in
   buildCarousel3D(panel);
 }
