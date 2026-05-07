@@ -163,8 +163,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
 .photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.6) 0%,transparent 28%,transparent 72%,rgba(0,0,0,0.6) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
 .photo-viewer-shots{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;z-index:3;pointer-events:none;padding:0 6px;}
-.photo-shot{width:26%;height:115%;display:flex;align-items:flex-end;justify-content:center;position:relative;bottom:-4%;transition:opacity 0.4s ease;}
-.photo-shot img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9));transition:opacity 0.4s ease;}
+.photo-shot{width:26%;height:115%;display:flex;align-items:flex-end;justify-content:center;position:relative;bottom:-4%;transition:opacity 0.4s ease;pointer-events:all;cursor:pointer;}
+.photo-shot img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9));transition:opacity 0.4s ease,filter 0.2s ease;}
+.photo-shot:hover img{filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9)) brightness(1.1);}
 .photo-shot-empty{width:37%;height:70%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-size:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;border:1px dashed rgba(255,255,255,0.07);background:rgba(0,0,0,0.25);}
 .panel-corner{position:absolute;width:14px;height:14px;border-color:rgba(232,160,32,0.4);border-style:solid;z-index:4;}
 .panel-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px;}
@@ -835,9 +836,15 @@ function buildStaticPanel(panelId, url) {
   img.onerror = () => {
     img.remove();
     panel.innerHTML = '<div class="photo-shot-empty"><div style="font-size:16px;opacity:0.2">&#9645;</div><div>NO IMAGE</div></div>';
+    panel.style.cursor = "default";
   };
   img.src = url;
   panel.appendChild(img);
+  // Click zooms just like carousel cards
+  panel.addEventListener("click", () => {
+    if (panel.querySelector(".photo-shot-empty")) return; // no zoom if no image
+    openZoom(url, null);
+  });
 }
 
 function buildDetailPanel() {
@@ -1084,11 +1091,13 @@ function openZoom(url, idx) {
   carouselZoomedUrl = url;
   carouselZoomedIdx = idx;
 
-  // Fade out front/back shots
+  // Fade out front/back shots (both if from carousel, just the other if from a shot)
   const front = document.getElementById("panel-front");
   const back = document.getElementById("panel-back");
-  if (front) front.style.opacity = "0";
-  if (back) back.style.opacity = "0";
+  const frontUrl = front && front.querySelector("img") ? front.querySelector("img").src : null;
+  const backUrl = back && back.querySelector("img") ? back.querySelector("img").src : null;
+  if (front) front.style.opacity = (url === frontUrl) ? "1" : "0";
+  if (back) back.style.opacity = (url === backUrl) ? "1" : "0";
 
   const zoom = document.getElementById("carousel-zoom");
   const zoomImg = document.getElementById("carousel-zoom-img");
