@@ -378,11 +378,11 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 const ANIM_COOLDOWN_MS = 5 * 60 * 1000;
 const MAX_DETAIL_SHOTS = 20;
-const GRADE_COLOR = { SD:"#d060e0", HG:"#4abfdf", RG:"#e84040", MG:"#e8a020", PG:"#e8c020", MEGASIZE:"#40c870", MISC:"#7090b0" };
-const GRADE_NAMES = { SD:"SUPER DEFORMED", HG:"HIGH GRADE", RG:"REAL GRADE", MG:"MASTER GRADE", PG:"PERFECT GRADE", MEGASIZE:"MEGASIZE MODEL", MISC:"MISCELLANEOUS" };
+const GRADE_COLOR = { SD:"#d060e0", HG:"#4abfdf", EG:"#ff6b35", RG:"#e84040", MG:"#e8a020", PG:"#e8c020", MEGASIZE:"#40c870", MISC:"#7090b0" };
+const GRADE_NAMES = { SD:"SUPER DEFORMED", HG:"HIGH GRADE", EG:"ENTRY GRADE", RG:"REAL GRADE", MG:"MASTER GRADE", PG:"PERFECT GRADE", MEGASIZE:"MEGASIZE MODEL", MISC:"MISCELLANEOUS" };
 const STATUS_COLOR = { built:"#40c870", backlog:"#e8a020", custom:"#d060e0" };
 const STATUS_LABEL = { built:"BUILT", backlog:"BACKLOG", custom:"CUSTOM" };
-const GRADE_ORDER = ["SD","HG","RG","MG","PG","MEGASIZE","MISC"];
+const GRADE_ORDER = ["SD","HG","EG","RG","MG","PG","MEGASIZE","MISC"];
 const BOOT_LINES = [
   { text:"EARTH FEDERATION FORCES // AUTONOMOUS ARCHIVE SYSTEM", delay:0 },
   { text:"INITIALIZING PRIMARY DATABASE CORE...", delay:350 },
@@ -401,7 +401,7 @@ let kits = [];
 let gradeFilter = "ALL";
 let statusFilter = "ALL";
 let searchQuery = "";
-let collapsed = { SD:true, HG:true, RG:true, MG:true, PG:true, MEGASIZE:true, MISC:true };
+let collapsed = { SD:true, HG:true, EG:true, RG:true, MG:true, PG:true, MEGASIZE:true, MISC:true };
 let currentModal = null;
 let carouselIdx = 0;
 let carouselTimer = null;
