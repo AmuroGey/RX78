@@ -412,7 +412,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     </div>
     <div class="about-text">
       <p>This archive documents every significant iteration of the RX-78 Gundam kit line. Data is stored in a flat <code>kits.json</code> file and loaded at runtime — no backend required. Hosted on GitHub Pages.</p>
-      <p>To add a kit: edit <code>kits.json</code> in the repository, commit, and push. Photos go in <code>photos/{GRADE}/{kit-id}/</code> as <code>front.jpg</code>, <code>back.jpg</code>, and <code>01.jpg</code>, <code>02.jpg</code> etc.</p>
+      <p>To add a kit: edit <code>kits.json</code> in the repository, commit, and push. Photos go in <code>photos/{GRADE}/{kit-id}/</code> as <code>front.png</code>, <code>back.png</code>, and <code>01.jpg</code>, <code>02.jpg</code> etc.</p>
     </div>
     <div class="rx-footer" style="margin-top:60px;padding:16px 0;">
       <span>RX-78 ARCHIVE // PERSONAL COLLECTION DATABASE</span>
@@ -814,11 +814,11 @@ function buildPhotoViewer(kit) {
   const base = `photos/${kit.grade}/${kit.id}`;
 
   // Static panels
-  buildStaticPanel("panel-front", `${base}/front.jpg`);
-  buildStaticPanel("panel-back", `${base}/back.jpg`);
+  buildStaticPanel("panel-front", `${base}/front.png`);
+  buildStaticPanel("panel-back", `${base}/back.png`);
 
   // Detail panel — probe shots
-  detailUrls = Array.from({length: MAX_DETAIL_SHOTS}, (_,i) => `${base}/${String(i+1).padStart(2,"0")}.jpg`);
+  detailUrls = Array.from({length: MAX_DETAIL_SHOTS}, (_,i) => `${base}/${String(i+1).padStart(2,"0")}.png`);
   buildDetailPanel();
 }
 
