@@ -163,7 +163,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:260px;--card-h:360px;cursor:grab;}
+.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:260px;--card-h:360px;cursor:grab;user-select:none;-webkit-user-select:none;}
 .photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
@@ -991,6 +991,7 @@ function buildDetailPanel() {
     const onViewerDragStart = (e) => {
       // Don't steal from slider or zoom interactions
       if (e.target.closest("#carousel-track") || e.target.closest(".carousel-zoom")) return;
+      e.preventDefault(); // prevent image drag / text selection
       dragSpinActive = true;
       dragSpinLastX = e.touches ? e.touches[0].clientX : e.clientX;
       pauseCarousel();
@@ -998,6 +999,7 @@ function buildDetailPanel() {
     };
     const onViewerDragMove = (e) => {
       if (!dragSpinActive) return;
+      e.preventDefault();
       const x = e.touches ? e.touches[0].clientX : e.clientX;
       const dx = x - dragSpinLastX;
       dragSpinLastX = x;
@@ -1008,16 +1010,21 @@ function buildDetailPanel() {
     const onViewerDragEnd = () => {
       if (!dragSpinActive) return;
       dragSpinActive = false;
-      viewer.style.cursor = "";
+      viewer.style.cursor = "grab";
       scheduleResume();
     };
 
     viewer.addEventListener("mousedown", onViewerDragStart);
-    viewer.addEventListener("touchstart", onViewerDragStart, { passive: true });
-    document.addEventListener("mousemove", onViewerDragMove);
-    document.addEventListener("touchmove", onViewerDragMove, { passive: true });
-    document.addEventListener("mouseup", onViewerDragEnd);
-    document.addEventListener("touchend", onViewerDragEnd);
+    viewer.addEventListener("touchstart", onViewerDragStart, { passive: false });
+    // Listen on window so release outside viewer is caught
+    window.addEventListener("mousemove", onViewerDragMove);
+    window.addEventListener("touchmove", onViewerDragMove, { passive: false });
+    window.addEventListener("mouseup", onViewerDragEnd);
+    window.addEventListener("touchend", onViewerDragEnd);
+    // Also catch if mouse leaves the window entirely
+    window.addEventListener("blur", onViewerDragEnd);
+    // Prevent image/element dragging inside viewer
+    viewer.addEventListener("dragstart", (e) => e.preventDefault());
   }
 
   // Show placeholder carousel immediately — rebuilds as real shots probe in
