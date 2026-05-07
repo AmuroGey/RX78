@@ -731,6 +731,8 @@ function buildDetailPanel() {
   // Probe images (hidden)
   const probeContainer = document.createElement("div");
   probeContainer.style.display = "none";
+  let errorCount = 0;
+
   detailUrls.forEach((url, i) => {
     const probe = document.createElement("img");
     probe.src = url;
@@ -740,6 +742,15 @@ function buildDetailPanel() {
         detailLoaded.sort((a,b) => a-b);
         updateDetailPanel();
         if (detailLoaded.length === 2) startCarousel();
+      }
+    };
+    probe.onerror = () => {
+      errorCount++;
+      // Once all probes have failed or errored and none loaded, show empty state
+      if (errorCount + detailLoaded.length === detailUrls.length && detailLoaded.length === 0) {
+        const dispImg = document.getElementById("detail-display-img");
+        if (dispImg) dispImg.remove();
+        panel.insertAdjacentHTML("afterbegin", emptyHTML());
       }
     };
     probeContainer.appendChild(probe);
