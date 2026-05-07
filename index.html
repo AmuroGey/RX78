@@ -523,6 +523,28 @@ let carouselZoomedIdx = null;
 
 // ── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
+  // Create global zoom overlay attached to body — outside modal DOM so it's never clipped
+  const zoomEl = document.createElement("div");
+  zoomEl.className = "carousel-zoom";
+  zoomEl.id = "carousel-zoom";
+  zoomEl.innerHTML = `
+    <div class="carousel-zoom-wrapper" id="carousel-zoom-wrapper">
+      <div class="carousel-zoom-card" id="carousel-zoom-card">
+        <img id="carousel-zoom-img" src="" alt="" />
+        <button class="carousel-zoom-close" id="carousel-zoom-close">&#10005;</button>
+      </div>
+    </div>
+  `;
+  zoomEl.addEventListener("click", (e) => { if (e.target === zoomEl) closeZoom(); });
+  document.getElementById("carousel-zoom-close") // will be available after append
+  document.body.appendChild(zoomEl);
+  document.getElementById("carousel-zoom-close").addEventListener("click", (e) => {
+    e.stopPropagation(); closeZoom();
+  });
+  document.getElementById("carousel-zoom-wrapper").addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
   // Load kits.json
   try {
     const res = await fetch("https://raw.githubusercontent.com/amurogey/RX78/main/kits.json");
@@ -916,32 +938,6 @@ function buildDetailPanel() {
   `;
   panel.appendChild(ctrl);
 
-  // Zoom overlay
-  const zoom = document.createElement("div");
-  zoom.className = "carousel-zoom";
-  zoom.id = "carousel-zoom";
-  zoom.innerHTML = `
-    <div class="carousel-zoom-wrapper" id="carousel-zoom-wrapper">
-      <div class="carousel-zoom-card" id="carousel-zoom-card">
-        <img id="carousel-zoom-img" src="" alt="" />
-        <button class="carousel-zoom-close" id="carousel-zoom-close">&#10005;</button>
-      </div>
-    </div>
-  `;
-  // Click on overlay background closes
-  zoom.addEventListener("click", (e) => {
-    if (e.target === zoom) closeZoom();
-  });
-  panel.appendChild(zoom);
-
-  document.getElementById("carousel-zoom-close").addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeZoom();
-  });
-  // Block clicks inside wrapper from bubbling to overlay or shots
-  document.getElementById("carousel-zoom-wrapper").addEventListener("click", (e) => {
-    e.stopPropagation();
-  });
 
   // Slider drag
   const track = document.getElementById("carousel-track");
