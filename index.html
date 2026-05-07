@@ -774,9 +774,13 @@ function openModal(kit) {
   currentModal = kit;
   detailLoaded = [];
   carouselAngle = 0;
+  carouselSpeed = 0.2;
+  carouselPaused = false;
   carouselZoomedUrl = null;
   carouselZoomedIdx = null;
-  if (carouselRAF) cancelAnimationFrame(carouselRAF);
+  carouselSliderDragging = false;
+  if (carouselRAF) { cancelAnimationFrame(carouselRAF); carouselRAF = null; }
+  if (carouselResumeTimer) { clearTimeout(carouselResumeTimer); carouselResumeTimer = null; }
 
   const c = GRADE_COLOR[kit.grade];
   const sc = STATUS_COLOR[kit.status];
@@ -814,7 +818,12 @@ function openModal(kit) {
 function buildPhotoViewer(kit) {
   const base = `photos/${kit.grade}/${kit.id}`;
 
-  // Static panels
+  // Reset front/back panels fully before rebuilding
+  const pf = document.getElementById("panel-front");
+  const pb = document.getElementById("panel-back");
+  if (pf) { pf.innerHTML = ""; pf.style.opacity = "1"; pf.replaceWith(pf.cloneNode(false)); }
+  if (pb) { pb.innerHTML = ""; pb.style.opacity = "1"; pb.replaceWith(pb.cloneNode(false)); }
+
   buildStaticPanel("panel-front", `${base}/front.png`);
   buildStaticPanel("panel-back", `${base}/back.png`);
 
@@ -841,8 +850,9 @@ function buildStaticPanel(panelId, url) {
   img.src = url;
   panel.appendChild(img);
   // Click zooms just like carousel cards
-  panel.addEventListener("click", () => {
-    if (panel.querySelector(".photo-shot-empty")) return; // no zoom if no image
+  panel.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (panel.querySelector(".photo-shot-empty")) return;
     openZoom(url, null);
   });
 }
@@ -902,7 +912,15 @@ function buildDetailPanel() {
   });
   panel.appendChild(zoom);
 
-  document.getElementById("carousel-zoom-close").addEventListener("click", closeZoom);
+  const zoomClose = document.getElementById("carousel-zoom-close");
+  zoomClose.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeZoom();
+  });
+  // Stop clicks on the card itself from bubbling to overlay or shots
+  document.getElementById("carousel-zoom-card").addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
 
   // Slider drag
   const track = document.getElementById("carousel-track");
@@ -1109,6 +1127,9 @@ function openZoom(url, idx) {
 function closeZoom() {
   const zoom = document.getElementById("carousel-zoom");
   if (!zoom) return;
+  // Temporarily block pointer events to prevent click-through to shots below
+  zoom.style.pointerEvents = "none";
+  setTimeout(() => { if (zoom) zoom.style.pointerEvents = ""; }, 350);
   zoom.classList.remove("open");
   carouselZoomedUrl = null;
 
