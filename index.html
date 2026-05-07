@@ -992,43 +992,41 @@ function buildDetailPanel() {
     }, { passive: false });
 
     // Drag anywhere on the photo viewer to spin the carousel
+    let dragSpinPointerDown = false;
     let dragSpinActive = false;
     let dragSpinLastX = 0;
     let dragSpinStartX = 0;
-    const DRAG_THRESHOLD = 6; // px before drag activates
+    const DRAG_THRESHOLD = 6;
 
     const onViewerDragStart = (e) => {
       if (e.target.closest("#carousel-track") || e.target.closest(".carousel-zoom")) return;
-      // Don't preventDefault here — let taps on shots fire naturally
-      dragSpinActive = false; // not active yet, waiting for threshold
+      dragSpinPointerDown = true;
+      dragSpinActive = false;
       dragSpinStartX = e.touches ? e.touches[0].clientX : e.clientX;
       dragSpinLastX = dragSpinStartX;
     };
     const onViewerDragMove = (e) => {
+      if (!dragSpinPointerDown) return;
       const x = e.touches ? e.touches[0].clientX : e.clientX;
       const dx = x - dragSpinLastX;
-      const totalDx = Math.abs(x - dragSpinStartX);
-
-      // Only activate drag once threshold is crossed
       if (!dragSpinActive) {
-        if (totalDx < DRAG_THRESHOLD) return;
+        if (Math.abs(x - dragSpinStartX) < DRAG_THRESHOLD) return;
         dragSpinActive = true;
         pauseCarousel();
         viewer.style.cursor = "grabbing";
       }
-
       e.preventDefault();
       dragSpinLastX = x;
       carouselAngle += dx * 0.5;
-      const pct = ((carouselAngle % 360) + 360) % 360 / 360;
-      updateSliderUI(pct);
+      updateSliderUI(((carouselAngle % 360) + 360) % 360 / 360);
     };
     const onViewerDragEnd = () => {
+      dragSpinPointerDown = false;
       if (dragSpinActive) {
+        dragSpinActive = false;
         viewer.style.cursor = "grab";
         scheduleResume();
       }
-      dragSpinActive = false;
     };
 
     viewer.addEventListener("mousedown", onViewerDragStart);
