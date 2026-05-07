@@ -1,0 +1,123 @@
+[
+  {
+    "id": "hg-revive-standard",
+    "grade": "HG",
+    "name": "RX-78-2 Gundam",
+    "mold": "Revive",
+    "variant": "Standard Ver.",
+    "year": 2015,
+    "status": "built",
+    "tags": ["revive", "1:144"],
+    "notes": ""
+  },
+  {
+    "id": "hg-revive-ana",
+    "grade": "HG",
+    "name": "RX-78-2 Gundam",
+    "mold": "Revive",
+    "variant": "ANA Original Color Ver.",
+    "year": 2016,
+    "status": "backlog",
+    "tags": ["collab", "airline", "limited"],
+    "notes": ""
+  },
+  {
+    "id": "hg-origin-standard",
+    "grade": "HG",
+    "name": "RX-78-2 Gundam",
+    "mold": "THE ORIGIN",
+    "variant": "Standard Ver.",
+    "year": 2015,
+    "status": "built",
+    "tags": ["origin"],
+    "notes": ""
+  },
+  {
+    "id": "hg-g40-standard",
+    "grade": "HG",
+    "name": "RX-78-2 Gundam",
+    "mold": "G40 Industrial Design",
+    "variant": "Standard Ver.",
+    "year": 2019,
+    "status": "built",
+    "tags": ["40th-anniversary", "industrial"],
+    "notes": ""
+  },
+  {
+    "id": "rg-01-standard",
+    "grade": "RG",
+    "name": "RX-78-2 Gundam",
+    "mold": "RG 01",
+    "variant": "Standard Ver.",
+    "year": 2010,
+    "status": "built",
+    "tags": ["first-rg"],
+    "notes": ""
+  },
+  {
+    "id": "rg-01-gold",
+    "grade": "RG",
+    "name": "RX-78-2 Gundam",
+    "mold": "RG 01",
+    "variant": "Gold Plated Ver.",
+    "year": 2012,
+    "status": "backlog",
+    "tags": ["limited", "plated", "event"],
+    "notes": ""
+  },
+  {
+    "id": "mg-30th-standard",
+    "grade": "MG",
+    "name": "RX-78-2 Gundam",
+    "mold": "Ver. 3.0",
+    "variant": "Standard Ver.",
+    "year": 2013,
+    "status": "built",
+    "tags": ["30th-anniversary"],
+    "notes": ""
+  },
+  {
+    "id": "mg-beyondglobal-standard",
+    "grade": "MG",
+    "name": "RX-78-2 Gundam",
+    "mold": "Beyond Global",
+    "variant": "Standard Ver.",
+    "year": 2018,
+    "status": "built",
+    "tags": ["beyond-global"],
+    "notes": ""
+  },
+  {
+    "id": "pg-unleashed-standard",
+    "grade": "PG",
+    "name": "RX-78-2 Gundam",
+    "mold": "Unleashed",
+    "variant": "Standard Ver.",
+    "year": 2020,
+    "status": "backlog",
+    "tags": ["perfect-grade", "led"],
+    "notes": ""
+  },
+  {
+    "id": "sd-bb-standard",
+    "grade": "SD",
+    "name": "RX-78-2 Gundam",
+    "mold": "BB Senshi",
+    "variant": "Standard Ver.",
+    "year": 1990,
+    "status": "built",
+    "tags": ["bb-senshi", "classic"],
+    "notes": ""
+  },
+  {
+    "id": "megasize-standard",
+    "grade": "MEGASIZE",
+    "name": "RX-78-2 Gundam",
+    "mold": "Megasize Model",
+    "variant": "Standard Ver.",
+    "year": 2010,
+    "status": "backlog",
+    "tags": ["1:48", "display"],
+    "notes": ""
+  }
+]
