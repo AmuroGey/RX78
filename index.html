@@ -6,6 +6,7 @@
 <title>RX-78 ARCHIVE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;900&family=Share+Tech&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --bg:#000000; --bg2:#0d1117; --panel:#0f1520;
@@ -277,7 +278,17 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .about-text p{margin-bottom:16px;}
 .about-text code{color:var(--amber);font-family:'Share Tech Mono',monospace;}
 
-::-webkit-scrollbar{width:6px;}
+/* QR CODES */
+.qr-section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;margin:40px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.qr-section-sub{font-family:'Share Tech',sans-serif;font-size:12px;color:var(--text-dim);margin-bottom:24px;line-height:1.6;}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:40px;}
+.qr-card{background:var(--panel);border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.2s;}
+.qr-card:hover{border-color:var(--amber);}
+.qr-canvas{background:#fff;padding:6px;display:flex;align-items:center;justify-content:center;}
+.qr-canvas canvas,.qr-canvas img{display:block;}
+.qr-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-dim);text-align:center;text-transform:uppercase;line-height:1.5;}
+.qr-label strong{display:block;color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:2px;}
+.qr-dl{font-size:9px;letter-spacing:1px;color:var(--cyan-dim);text-transform:uppercase;margin-top:2px;}
 ::-webkit-scrollbar-track{background:#000;}
 ::-webkit-scrollbar-thumb{background:var(--border-bright);}
 
@@ -424,6 +435,10 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
       <p>This archive documents every significant iteration of the RX-78 Gundam kit line. Data is stored in a flat <code>kits.json</code> file and loaded at runtime — no backend required. Hosted on GitHub Pages.</p>
       <p>To add a kit: edit <code>kits.json</code> in the repository, commit, and push. Photos go in <code>photos/{GRADE}/{kit-id}/</code> as <code>front.png</code>, <code>back.png</code>, and <code>01.jpg</code>, <code>02.jpg</code> etc.</p>
     </div>
+
+    <div class="qr-section-label">QR Codes</div>
+    <div class="qr-section-sub">Each code links directly to that kit. Scan to open the modal, or click any card to download the QR image.</div>
+    <div class="qr-grid" id="qr-grid"></div>
     <div class="rx-footer" style="margin-top:60px;padding:16px 0;">
       <span>RX-78 ARCHIVE // PERSONAL COLLECTION DATABASE</span>
       <span>FOR COLLECTORS, BY A COLLECTOR</span>
@@ -563,7 +578,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   buildDropdowns();
   renderRegistry();
 
-  // Check cooldown
+  // ── DEEP LINK: check for #kit-id in URL ─────────────────────────────────
+  const hash = window.location.hash.replace("#", "");
+  if (hash) {
+    const kit = kits.find(k => k.id === hash);
+    if (kit) {
+      // Skip boot — go straight to collection with modal open
+      document.getElementById("gundam-active").classList.add("visible", "pulse");
+      document.getElementById("gundam-bg").style.opacity = "0.2";
+      document.getElementById("nav").classList.add("visible");
+      document.getElementById("page-collection").classList.add("active");
+      setTimeout(() => {
+        document.getElementById("page-collection").classList.add("visible");
+        openModal(kit);
+      }, 50);
+      return; // skip landing screen
+    }
+  }
+
+  // Normal landing screen
   sessionStorage.removeItem("rx78_last_anim");
   setTimeout(() => {
     document.getElementById("landing-gradient").classList.add("visible");
@@ -670,6 +703,7 @@ document.querySelectorAll(".nav-links button").forEach(btn => {
     const page = document.getElementById(pageId);
     page.classList.add("active");
     setTimeout(() => page.classList.add("visible"), 50);
+    if (btn.dataset.page === "about") buildQrGrid();
   });
 });
 
@@ -882,6 +916,7 @@ function openModal(kit) {
 
   document.getElementById("modal-bg").classList.add("open");
   document.body.style.overflow = "hidden";
+  history.replaceState(null, "", "#" + kit.id);
 }
 
 function buildPhotoViewer(kit) {
@@ -1261,11 +1296,92 @@ function closeModal() {
   document.body.style.overflow = "";
   stopCarousel();
   currentModal = null;
+  history.replaceState(null, "", window.location.pathname);
 }
 
 document.getElementById("modal-close").addEventListener("click", closeModal);
 document.getElementById("modal-bg").addEventListener("click", (e) => { if (e.target === document.getElementById("modal-bg")) closeModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+// ── QR CODE GRID ─────────────────────────────────────────────────────────────
+let qrBuilt = false;
+function buildQrGrid() {
+  if (qrBuilt || !kits.length) return;
+  qrBuilt = true;
+  const grid = document.getElementById("qr-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const base = "https://amurogey.github.io/RX78/";
+
+  kits.forEach(kit => {
+    const url = base + "#" + kit.id;
+    const c = GRADE_COLOR[kit.grade] || "#888";
+
+    const card = document.createElement("div");
+    card.className = "qr-card";
+    card.title = "Click to download";
+
+    const qrWrap = document.createElement("div");
+    qrWrap.className = "qr-canvas";
+
+    const label = document.createElement("div");
+    label.className = "qr-label";
+    label.innerHTML = `<strong>${kit.grade}</strong>${kit.mold}<br><span style="color:var(--text-dim)">${kit.variant}</span>`;
+
+    card.appendChild(qrWrap);
+    card.appendChild(label);
+    grid.appendChild(card);
+
+    // Generate QR
+    const qr = new QRCode(qrWrap, {
+      text: url,
+      width: 120,
+      height: 120,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+
+    // Click to download
+    card.addEventListener("click", () => {
+      // QRCode.js renders a canvas — grab it
+      const canvas = qrWrap.querySelector("canvas");
+      if (!canvas) return;
+
+      // Stamp the kit label onto a slightly larger canvas for context
+      const out = document.createElement("canvas");
+      const pad = 16;
+      const labelH = 36;
+      out.width = canvas.width + pad * 2;
+      out.height = canvas.height + pad * 2 + labelH;
+      const ctx = out.getContext("2d");
+
+      ctx.fillStyle = "#0d1117";
+      ctx.fillRect(0, 0, out.width, out.height);
+
+      // Amber top bar
+      ctx.fillStyle = c;
+      ctx.fillRect(0, 0, out.width, 3);
+
+      ctx.drawImage(canvas, pad, pad);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`${kit.grade} · ${kit.mold}`, out.width / 2, canvas.height + pad + 18);
+      ctx.fillStyle = "#888";
+      ctx.font = "10px monospace";
+      ctx.fillText(kit.variant, out.width / 2, canvas.height + pad + 32);
+
+      const a = document.createElement("a");
+      a.download = `qr-${kit.id}.png`;
+      a.href = out.toDataURL("image/png");
+      a.click();
+    });
+  });
+}
+
 </script>
 </body>
 </html>
