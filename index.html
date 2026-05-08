@@ -306,8 +306,11 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .qr-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-dim);text-align:center;text-transform:uppercase;line-height:1.5;}
 .qr-label strong{display:block;color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:2px;}
 .qr-dl{font-size:9px;letter-spacing:1px;color:var(--cyan-dim);text-transform:uppercase;margin-top:2px;}
-::-webkit-scrollbar-track{background:#000;}
-::-webkit-scrollbar-thumb{background:var(--border-bright);}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-track{background:transparent;}
+.modal::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:2px;}
+.modal::-webkit-scrollbar-thumb:hover{background:var(--amber);}
+.modal{scrollbar-width:thin;scrollbar-color:var(--border-bright) transparent;}
 
 /* MOBILE */
 @media(max-width:700px){
