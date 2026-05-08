@@ -1190,40 +1190,41 @@ function startCarousel3D(count) {
   function tick() {
     const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
     const cardW = ring.children[0] ? ring.children[0].offsetWidth : 150;
+    const halfW = viewerW * 0.5;
+    const exitEdge = halfW + cardW * 0.6;
 
     if (!carouselPaused) {
       carouselAngle += carouselSpeed;
     }
 
+    // Normalize to a 0–1 phase across one full cycle (count cards)
+    // carouselAngle in px, one cycle = count * spacingPx
     const spacingPx = viewerW * SPACING;
     const totalCycle = count * spacingPx;
-    const halfW = viewerW * 0.5;
-    const exitEdge = halfW + cardW;
+    const phase = ((carouselAngle % totalCycle) + totalCycle) % totalCycle / totalCycle;
 
     Array.from(ring.children).forEach((card, i) => {
-      // Raw position: each card starts at its slot, moves left as angle grows
-      let x = i * spacingPx - carouselAngle;
+      // Each card's phase offset, evenly distributed around the 0–1 cycle
+      let p = (phase + i / count) % 1;
+      // Map phase to pixel position: 0=right entry, 0.5=center, 1=left exit
+      // Remap so center of screen is at phase=0.5
+      let x = (p - 0.5) * totalCycle;
 
-      // Wrap this card individually into the window — no global reset
-      x = ((x % totalCycle) + totalCycle) % totalCycle;
-      // Shift so cards are centered: map [0, totalCycle) → [-totalCycle/2, totalCycle/2)
-      if (x > totalCycle / 2) x -= totalCycle;
-
+      // If a card is in the invisible back half (too far left or right), 
+      // it's already wrapped by the modulo — nothing extra needed.
+      // Fade/scale by distance from center
       const dist = Math.abs(x) / exitEdge;
-      const depth = Math.max(0, 1 - dist * 1.4);
-      const depthSharp = Math.pow(depth, 1.6);
+      const depth = Math.max(0, 1 - dist * 1.1);
+      const depthSharp = Math.pow(depth, 1.8);
 
       const scale = 0.6 + depthSharp * 0.4;
-      const opacity = Math.max(0, depthSharp * 1.15 - 0.05);
+      const opacity = Math.max(0, depthSharp * 1.2 - 0.05);
 
       card.style.transform = `translateX(${x}px) scale(${scale})`;
       card.style.opacity = String(opacity);
       card.style.zIndex = String(Math.round(depthSharp * 10));
-      card.classList.toggle("is-front", dist < 0.18);
+      card.classList.toggle("is-front", dist < 0.15);
     });
-
-    // slider: carouselAngle mod one full cycle → 0-1
-    const pct = ((carouselAngle % totalCycle) + totalCycle) % totalCycle / totalCycle;
 
     carouselRAF = requestAnimationFrame(tick);
   }
