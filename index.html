@@ -163,15 +163,15 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:260px;--card-h:360px;cursor:grab;user-select:none;-webkit-user-select:none;}
+.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:140px;--card-h:340px;cursor:grab;user-select:none;-webkit-user-select:none;}
 .photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
 .photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.25) 0%,transparent 22%,transparent 78%,rgba(0,0,0,0.25) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
 .photo-viewer-shots{position:absolute;inset:0;z-index:4;pointer-events:none;}
 .photo-shot{position:absolute;bottom:-7%;width:30%;height:128%;display:flex;align-items:flex-end;justify-content:center;transition:opacity 0.4s ease;pointer-events:all;cursor:pointer;}
-#panel-front{left:6%;}
-#panel-back{right:6%;}
+#panel-front{left:14%;}
+#panel-back{right:14%;}
 .photo-shot img{max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));transition:opacity 0.4s ease,filter 0.2s ease;}
 .photo-shot:hover img{filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95)) brightness(1.12);}
 .photo-shot-empty{width:37%;height:70%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-size:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;border:1px dashed rgba(255,255,255,0.07);background:rgba(0,0,0,0.25);}
@@ -206,7 +206,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   will-change:transform,opacity;
   transform-origin:center center;
 }
-.carousel-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.carousel-card img{width:100%;height:100%;object-fit:contain;object-position:center center;display:block;}
 .carousel-card:hover{border-color:rgba(232,160,32,0.7);box-shadow:0 0 20px rgba(232,160,32,0.15);}
 
 /* ZOOMED CARD */
@@ -270,7 +270,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 
 
 @media(min-width:701px) and (max-width:1100px){
-  .photo-viewer{height:340px;--card-w:180px;--card-h:250px;}
+  .photo-viewer{height:340px;--card-w:100px;--card-h:220px;}
 }
 /* FOOTER */
 .rx-footer{border-top:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:40px;background:rgba(0,0,0,0.6);}
@@ -319,7 +319,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .status-desktop{display:none;}
   .status-mobile{display:inline-block;}
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
-  .photo-viewer{height:220px;--card-w:120px;--card-h:170px;}
+  .photo-viewer{height:220px;--card-w:80px;--card-h:170px;}
   .panel-corner{width:10px;height:10px;}
   .photo-shot{width:38%;}
   #panel-front{left:2%;}
@@ -583,12 +583,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ── BOOT SEQUENCE ───────────────────────────────────────────────────────────
+let bootInProgress = false;
+let bootTimers = [];
+
+function finishBoot() {
+  if (!bootInProgress) return;
+  bootInProgress = false;
+  // Clear all pending boot timers
+  bootTimers.forEach(t => clearTimeout(t));
+  bootTimers = [];
+
+  const boot = document.getElementById("boot");
+  const scan = document.getElementById("boot-scan");
+  const linesEl = document.getElementById("boot-lines");
+
+  // Show all boot lines immediately
+  linesEl.innerHTML = "";
+  BOOT_LINES.forEach((line, i) => {
+    const el = document.createElement("div");
+    el.className = "boot-line show" + (i < BOOT_LINES.length - 1 ? " past" : "");
+    el.textContent = line.text;
+    linesEl.appendChild(el);
+  });
+
+  scan.classList.remove("go");
+  requestAnimationFrame(() => scan.classList.add("done"));
+  boot.classList.remove("visible");
+
+  document.getElementById("gundam-active").classList.add("visible");
+  setTimeout(() => {
+    document.getElementById("gundam-active").classList.add("pulse");
+    document.getElementById("gundam-bg").style.opacity = "0.2";
+    document.getElementById("nav").classList.add("visible");
+    document.getElementById("page-collection").classList.add("active");
+    setTimeout(() => document.getElementById("page-collection").classList.add("visible"), 50);
+  }, 300);
+}
+
 document.getElementById("access-btn").addEventListener("click", () => {
   sessionStorage.setItem("rx78_last_anim", Date.now());
+  bootInProgress = true;
   document.getElementById("landing-content").classList.remove("visible");
   document.getElementById("landing-gradient").classList.remove("visible");
 
-  setTimeout(() => {
+  const t0 = setTimeout(() => {
     const boot = document.getElementById("boot");
     const scan = document.getElementById("boot-scan");
     const linesEl = document.getElementById("boot-lines");
@@ -597,37 +635,35 @@ document.getElementById("access-btn").addEventListener("click", () => {
     scan.classList.add("go");
 
     BOOT_LINES.forEach((line, i) => {
-      setTimeout(() => {
+      const t = setTimeout(() => {
         const el = document.createElement("div");
         el.className = "boot-line";
         el.textContent = line.text;
         linesEl.appendChild(el);
         requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("show")));
-        // dim previous lines
         linesEl.querySelectorAll(".boot-line.show:not(:last-child)").forEach(l => l.classList.add("past"));
       }, line.delay + 500);
+      bootTimers.push(t);
     });
 
     const lastDelay = BOOT_LINES[BOOT_LINES.length - 1].delay;
 
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       document.getElementById("gundam-active").classList.add("visible");
     }, lastDelay + 200);
+    bootTimers.push(t1);
 
-    setTimeout(() => {
-      scan.classList.remove("go");
-      // Allow one frame before adding done so opacity transition fires cleanly
-      requestAnimationFrame(() => scan.classList.add("done"));
-      boot.classList.remove("visible");
-      setTimeout(() => {
-        document.getElementById("gundam-active").classList.add("pulse");
-        document.getElementById("gundam-bg").style.opacity = "0.2";
-        document.getElementById("nav").classList.add("visible");
-        document.getElementById("page-collection").classList.add("active");
-        setTimeout(() => document.getElementById("page-collection").classList.add("visible"), 50);
-      }, 500);
+    const t2 = setTimeout(() => {
+      finishBoot();
     }, lastDelay + 1600);
+    bootTimers.push(t2);
   }, 500);
+  bootTimers.push(t0);
+});
+
+// Double-click anywhere during boot to skip to end
+document.addEventListener("dblclick", () => {
+  if (bootInProgress) finishBoot();
 });
 
 // Replay animation on nav mark click
@@ -959,8 +995,11 @@ function buildDetailPanel() {
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     const rect = track.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
-    // Directly map slider 0-1 to carousel angle 0-360
-    carouselAngle = pct * 360;
+    // Map 0-1 across the full conveyor cycle (count * spacing in px)
+    const viewerW = document.getElementById("photo-viewer").offsetWidth || 900;
+    const spacingPx = viewerW * 0.22;
+    const totalRange = (document.getElementById("carousel-ring")?.children.length || 3) * spacingPx;
+    carouselAngle = pct * totalRange;
     updateSliderUI(pct);
   };
   const onDragEnd = () => {
@@ -970,10 +1009,12 @@ function buildDetailPanel() {
   };
 
   track.addEventListener("mousedown", (e) => {
-    // Snap immediately on click before drag starts
     const rect = track.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    carouselAngle = pct * 360;
+    const viewerW = document.getElementById("photo-viewer").offsetWidth || 900;
+    const spacingPx = viewerW * 0.22;
+    const totalRange = (document.getElementById("carousel-ring")?.children.length || 3) * spacingPx;
+    carouselAngle = pct * totalRange;
     updateSliderUI(pct);
     onDragStart(e);
   });
@@ -988,10 +1029,8 @@ function buildDetailPanel() {
   if (viewer) {
     viewer.addEventListener("wheel", (e) => {
       e.preventDefault();
-      carouselAngle += e.deltaY * 0.15;
+      carouselAngle += e.deltaY * 0.5;
       pauseCarousel();
-      const pct = ((carouselAngle % 360) + 360) % 360 / 360;
-      updateSliderUI(pct);
       scheduleResume();
     }, { passive: false });
 
@@ -1021,8 +1060,8 @@ function buildDetailPanel() {
       }
       e.preventDefault();
       dragSpinLastX = x;
-      carouselAngle += dx * 0.5;
-      updateSliderUI(((carouselAngle % 360) + 360) % 360 / 360);
+      carouselAngle += dx * 1.0;
+      updateSliderUI(0); // slider sync happens in tick()
     };
     const onViewerDragEnd = () => {
       dragSpinPointerDown = false;
@@ -1115,42 +1154,61 @@ function startCarousel3D(count) {
   if (carouselRAF) cancelAnimationFrame(carouselRAF);
   const ring = document.getElementById("carousel-ring");
   if (!ring) return;
-  const angleStep = 360 / count;
+
+  // conveyor belt: each card has a position in a virtual "slot" lane
+  // lane goes from -0.5 (left edge, just offscreen) to +0.5 (right edge)
+  // 3 cards are always visible; extras sit in the queue off-screen right
+  // when a card exits left it teleports to the back of the right queue
+
+  // carouselAngle is repurposed as a continuous offset (0-1 = one full card spacing)
+  const VISIBLE = 3;
+  // spacing between card centers as a fraction of viewer width
+  const SPACING = 0.22;
 
   function tick() {
-    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 180;
-    // Tighter radius for a flatter spread
-    const radius = Math.max(cardW * 0.28, count * cardW * 0.17);
+    const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
+    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 140;
+
     if (!carouselPaused || carouselSliderDragging) {
+      // advance offset; one full unit = one card spacing in pixels
       carouselAngle += carouselSpeed;
     }
 
+    // offset in px, cycling per card spacing
+    const spacingPx = viewerW * SPACING;
+    const offsetPx = (carouselAngle % spacingPx + spacingPx) % spacingPx;
+
     Array.from(ring.children).forEach((card, i) => {
-      const cardAngle = ((i * angleStep + carouselAngle) % 360 + 360) % 360;
-      const rad = cardAngle * Math.PI / 180;
+      // Each card's base center position (relative to viewer center)
+      // Spread around center: card 0 at -(VISIBLE-1)/2 * spacing, etc.
+      const slotCenter = (i - (count - 1) / 2) * spacingPx;
+      let x = slotCenter - offsetPx;
 
-      // X: compressed — multiply sin by 0.7 so the arc is flatter side-to-side
-      const x = Math.sin(rad) * radius * 0.7;
+      // Wrap: if a card exits far left, move it to the far right of the queue
+      const halfW = viewerW * 0.5;
+      const wrapRange = count * spacingPx;
+      while (x < -halfW - cardW) x += wrapRange;
+      while (x >  halfW + cardW) x -= wrapRange;
 
-      // Raw depth: 1 at front (0°), 0 at back (180°)
-      const rawDepth = (Math.cos(rad) + 1) / 2;
+      // Depth: cards close to center are "front", cards toward edges fade
+      // Normalize distance from center: 0=center, 1=edge
+      const dist = Math.abs(x) / (halfW + cardW * 0.5);
+      const depth = Math.max(0, 1 - dist * 1.4);
+      const depthSharp = Math.pow(depth, 1.6);
 
-      // Hard falloff — cards past ~100° from front become invisible fast
-      // Use a sharpened curve: raise to power 3 so rear cards collapse quickly
-      const depth = Math.pow(rawDepth, 3);
-
-      const scale = 0.5 + depth * 0.5;
+      const scale = 0.6 + depthSharp * 0.4;
+      const opacity = Math.max(0, depthSharp * 1.15 - 0.05);
 
       card.style.transform = `translateX(${x}px) scale(${scale})`;
-      // Opacity hits 0 well before cards reach the back — feels like they disappear off stage
-      card.style.opacity = String(Math.max(0, depth * 1.2 - 0.05));
-      card.style.zIndex = String(Math.round(depth * 10));
+      card.style.opacity = String(opacity);
+      card.style.zIndex = String(Math.round(depthSharp * 10));
 
-      const isFront = rawDepth > 0.85;
+      const isFront = dist < 0.18;
       card.classList.toggle("is-front", isFront);
     });
 
-    const pct = ((carouselAngle % 360) + 360) % 360 / 360;
+    // slider: map offsetPx within one spacingPx cycle to 0-1
+    const pct = (carouselAngle % (count * spacingPx) + count * spacingPx) % (count * spacingPx) / (count * spacingPx);
     if (!carouselSliderDragging) updateSliderUI(pct);
 
     carouselRAF = requestAnimationFrame(tick);
