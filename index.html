@@ -1159,39 +1159,31 @@ function startCarousel3D(count) {
   // 3 cards are always visible; extras sit in the queue off-screen right
   // when a card exits left it teleports to the back of the right queue
 
-  // carouselAngle is repurposed as a continuous offset (0-1 = one full card spacing)
-  const VISIBLE = 3;
-  // spacing between card centers as a fraction of viewer width
   const SPACING = 0.13;
 
   function tick() {
     const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
-    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 140;
+    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 150;
 
     if (!carouselPaused || carouselSliderDragging) {
-      // advance offset; one full unit = one card spacing in pixels
       carouselAngle += carouselSpeed;
     }
 
-    // offset in px, cycling per card spacing
     const spacingPx = viewerW * SPACING;
-    const offsetPx = (carouselAngle % spacingPx + spacingPx) % spacingPx;
+    const totalCycle = count * spacingPx;
+    const halfW = viewerW * 0.5;
+    const exitEdge = halfW + cardW;
 
     Array.from(ring.children).forEach((card, i) => {
-      // Each card's base center position (relative to viewer center)
-      // Spread around center: card 0 at -(VISIBLE-1)/2 * spacing, etc.
-      const slotCenter = (i - (count - 1) / 2) * spacingPx;
-      let x = slotCenter - offsetPx;
+      // Raw position: each card starts at its slot, moves left as angle grows
+      let x = i * spacingPx - carouselAngle;
 
-      // Wrap: if a card exits far left, move it to the far right of the queue
-      const halfW = viewerW * 0.5;
-      const wrapRange = count * spacingPx;
-      while (x < -halfW - cardW) x += wrapRange;
-      while (x >  halfW + cardW) x -= wrapRange;
+      // Wrap this card individually into the window — no global reset
+      x = ((x % totalCycle) + totalCycle) % totalCycle;
+      // Shift so cards are centered: map [0, totalCycle) → [-totalCycle/2, totalCycle/2)
+      if (x > totalCycle / 2) x -= totalCycle;
 
-      // Depth: cards close to center are "front", cards toward edges fade
-      // Normalize distance from center: 0=center, 1=edge
-      const dist = Math.abs(x) / (halfW + cardW * 0.5);
+      const dist = Math.abs(x) / exitEdge;
       const depth = Math.max(0, 1 - dist * 1.4);
       const depthSharp = Math.pow(depth, 1.6);
 
@@ -1201,13 +1193,11 @@ function startCarousel3D(count) {
       card.style.transform = `translateX(${x}px) scale(${scale})`;
       card.style.opacity = String(opacity);
       card.style.zIndex = String(Math.round(depthSharp * 10));
-
-      const isFront = dist < 0.18;
-      card.classList.toggle("is-front", isFront);
+      card.classList.toggle("is-front", dist < 0.18);
     });
 
-    // slider: map offsetPx within one spacingPx cycle to 0-1
-    const pct = (carouselAngle % (count * spacingPx) + count * spacingPx) % (count * spacingPx) / (count * spacingPx);
+    // slider: carouselAngle mod one full cycle → 0-1
+    const pct = ((carouselAngle % totalCycle) + totalCycle) % totalCycle / totalCycle;
     if (!carouselSliderDragging) updateSliderUI(pct);
 
     carouselRAF = requestAnimationFrame(tick);
