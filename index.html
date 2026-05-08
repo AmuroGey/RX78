@@ -1120,27 +1120,36 @@ function getDisplayUrls() {
 }
 
 function buildCarousel3D(panel) {
-  // Remove old ring if exists
   const old = document.getElementById("carousel-ring");
   if (old) old.remove();
 
   const urls = getDisplayUrls();
   if (!urls.length) return;
 
-  const count = urls.length;
+  const realCount = urls.length;
   const scene = document.createElement("div");
   scene.className = "carousel-scene";
   const ring = document.createElement("div");
   ring.className = "carousel-ring";
   ring.id = "carousel-ring";
 
-  urls.forEach((entry, i) => {
+  // Tile the set enough times so the band always fills the viewer with no gaps.
+  // We don't know cardW yet (CSS hasn't rendered), so assume ~190px and target
+  // covering viewer (~900px) + generous fade (~600px each side) = ~2100px.
+  // With 4 cards at ~194px spacing = ~776px/set → need ~3 copies minimum.
+  // Use 5 copies to be safe at any card count.
+  const TILES = 5;
+  const tiledUrls = [];
+  for (let t = 0; t < TILES; t++) {
+    urls.forEach((entry, i) => tiledUrls.push({ ...entry, realIdx: i }));
+  }
+
+  tiledUrls.forEach((entry, i) => {
     const card = document.createElement("div");
     card.className = "carousel-card";
     card.dataset.idx = i;
 
     if (entry.placeholder) {
-      // Placeholder card
       card.innerHTML = `
         <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(90,122,154,0.5);">
           <div style="font-size:22px;opacity:0.25">&#9645;</div>
@@ -1152,65 +1161,51 @@ function buildCarousel3D(panel) {
       img.src = entry.url;
       img.alt = "";
       card.appendChild(img);
-      card.addEventListener("click", () => openZoom(entry.url, i));
+      card.addEventListener("click", () => openZoom(entry.url, entry.realIdx));
     }
 
     ring.appendChild(card);
   });
 
   scene.appendChild(ring);
-  // Insert before controls
   const ctrl = document.getElementById("carousel-ctrl");
   panel.insertBefore(scene, ctrl);
 
-  // Show controls + count
   document.getElementById("carousel-ctrl").style.display = "flex";
   document.getElementById("carousel-count").textContent = detailLoaded.length > 0 ? detailLoaded.length + " SHOTS" : "NO PHOTOS";
 
-  // Start animation
-  startCarousel3D(count);
+  startCarousel3D(tiledUrls.length, realCount);
 }
 
-function startCarousel3D(count) {
+function startCarousel3D(count, realCount) {
   if (carouselRAF) cancelAnimationFrame(carouselRAF);
   const ring = document.getElementById("carousel-ring");
   if (!ring) return;
 
   function tick() {
     const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
-    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 150;
+    const cardW = ring.children[0] ? ring.children[0].offsetWidth : 185;
     const halfW = viewerW * 0.5;
 
-    if (!carouselPaused) {
-      carouselAngle += carouselSpeed;
-    }
+    if (!carouselPaused) carouselAngle += carouselSpeed;
 
     const spacingPx = cardW * 1.02;
-    // We want fadeEdge = halfW + cardW*3 for a generous spread.
-    // totalCycle must be >= fadeEdge*2 so halfCycle >= fadeEdge (no clamp needed).
-    // Achieve this by padding the cycle with extra ghost slots beyond the real cards.
-    const wantedFade = halfW + cardW * 3;
-    const minCycle = wantedFade * 2 + spacingPx;
-    const totalCycle = Math.max(count * spacingPx, minCycle);
-    const halfCycle = totalCycle * 0.5;
-    const fadeEdge = wantedFade; // always <= halfCycle by construction
-
-    const offset = carouselAngle % totalCycle;
+    const totalCycle = count * spacingPx;
+    const offset = ((carouselAngle % totalCycle) + totalCycle) % totalCycle;
+    const fadeEdge = halfW + cardW * 3;
 
     Array.from(ring.children).forEach((card, i) => {
-      const baseX = i * spacingPx - offset;
-      const tileShift = Math.round(baseX / totalCycle) * totalCycle;
-      const x = baseX - tileShift;
+      let x = i * spacingPx - offset;
+      // Wrap into [-totalCycle/2, totalCycle/2)
+      x = ((x % totalCycle) + totalCycle) % totalCycle;
+      if (x > totalCycle / 2) x -= totalCycle;
 
       const dist = Math.abs(x) / fadeEdge;
       const depth = Math.max(0, 1 - dist);
       const depthSharp = Math.pow(depth, 1.4);
 
-      const scale = 0.6 + depthSharp * 0.4;
-      const opacity = Math.max(0, depthSharp * 1.1 - 0.05);
-
-      card.style.transform = `translateX(${x}px) scale(${scale})`;
-      card.style.opacity = String(opacity);
+      card.style.transform = `translateX(${x}px) scale(${0.6 + depthSharp * 0.4})`;
+      card.style.opacity = String(Math.max(0, depthSharp * 1.1 - 0.05));
       card.style.zIndex = String(Math.round(depthSharp * 10));
       card.classList.toggle("is-front", dist < 0.12);
     });
