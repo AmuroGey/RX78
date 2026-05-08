@@ -546,6 +546,7 @@ let carouselSpeed = 0.2;     // degrees per frame (base auto speed)
 let carouselRAF = null;       // requestAnimationFrame handle
 let carouselPaused = false;
 let carouselResumeTimer = null;
+let loadingTimer = null;
 let carouselZoomedUrl = null;
 let carouselZoomedIdx = null;
 
@@ -1019,29 +1020,11 @@ function buildDetailPanel() {
   probeContainer.style.display = "none";
   panel.appendChild(probeContainer);
 
-  const totalProbes = detailUrls.length;
-  let settledCount = 0;
-
-  function dismissLoading() {
+  if (loadingTimer) clearTimeout(loadingTimer);
+  loadingTimer = setTimeout(() => {
     const el = document.getElementById("photo-viewer-loading");
     if (el) el.classList.add("done");
-  }
-
-  // Hard fallback — safety net only, should never be needed in practice
-  const fallbackTimer = setTimeout(dismissLoading, 30000);
-
-  function onProbeSettled() {
-    settledCount++;
-    if (settledCount >= totalProbes) {
-      clearTimeout(fallbackTimer);
-      setTimeout(dismissLoading, 80);
-    }
-  }
-
-  if (totalProbes === 0) {
-    clearTimeout(fallbackTimer);
-    setTimeout(dismissLoading, 80);
-  }
+  }, 6000);
 
   detailUrls.forEach((url, i) => {
     const probe = document.createElement("img");
@@ -1051,9 +1034,8 @@ function buildDetailPanel() {
         detailLoaded.sort((a,b) => a-b);
         buildCarousel3D(panel);
       }
-      onProbeSettled();
     };
-    probe.onerror = () => onProbeSettled();
+    probe.onerror = () => {};
     probe.src = url;
     probeContainer.appendChild(probe);
   });
@@ -1333,6 +1315,7 @@ function closeModal() {
   document.body.style.overflow = "";
   stopCarousel();
   currentModal = null;
+  if (loadingTimer) { clearTimeout(loadingTimer); loadingTimer = null; }
   history.replaceState(null, "", window.location.pathname);
 }
 
