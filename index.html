@@ -167,11 +167,13 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
-.photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.6) 0%,transparent 28%,transparent 72%,rgba(0,0,0,0.6) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
-.photo-viewer-shots{position:absolute;left:4%;right:4%;top:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;z-index:3;pointer-events:none;}
-.photo-shot{width:32%;height:128%;display:flex;align-items:flex-end;justify-content:center;position:relative;bottom:7%;transition:opacity 0.4s ease;pointer-events:all;cursor:pointer;}
-.photo-shot img{max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9));transition:opacity 0.4s ease,filter 0.2s ease;}
-.photo-shot:hover img{filter:drop-shadow(0 8px 32px rgba(0,0,0,0.9)) brightness(1.1);}
+.photo-viewer-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0.25) 0%,transparent 22%,transparent 78%,rgba(0,0,0,0.25) 100%),linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 40%);}
+.photo-viewer-shots{position:absolute;inset:0;z-index:4;pointer-events:none;}
+.photo-shot{position:absolute;bottom:-7%;width:30%;height:128%;display:flex;align-items:flex-end;justify-content:center;transition:opacity 0.4s ease;pointer-events:all;cursor:pointer;}
+#panel-front{left:6%;}
+#panel-back{right:6%;}
+.photo-shot img{max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));transition:opacity 0.4s ease,filter 0.2s ease;}
+.photo-shot:hover img{filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95)) brightness(1.12);}
 .photo-shot-empty{width:37%;height:70%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-size:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;border:1px dashed rgba(255,255,255,0.07);background:rgba(0,0,0,0.25);}
 .panel-corner{position:absolute;width:14px;height:14px;border-color:rgba(232,160,32,0.4);border-style:solid;z-index:4;}
 .panel-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px;}
@@ -319,7 +321,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
   .photo-viewer{height:220px;--card-w:120px;--card-h:170px;}
   .panel-corner{width:10px;height:10px;}
-  .photo-shot{width:36%;}
+  .photo-shot{width:38%;}
+  #panel-front{left:2%;}
+  #panel-back{right:2%;}
   .modal-body{grid-template-columns:1fr;}
   .modal-left{border-right:none;border-bottom:1px solid var(--border);}
   .modal-header{padding:16px;}
@@ -1114,9 +1118,9 @@ function startCarousel3D(count) {
   const angleStep = 360 / count;
 
   function tick() {
-    // Read card width live so radius always matches rendered card size
     const cardW = ring.children[0] ? ring.children[0].offsetWidth : 180;
-    const radius = Math.max(cardW * 0.344, count * cardW * 0.219);
+    // Tighter radius for a flatter spread
+    const radius = Math.max(cardW * 0.28, count * cardW * 0.17);
     if (!carouselPaused || carouselSliderDragging) {
       carouselAngle += carouselSpeed;
     }
@@ -1125,21 +1129,27 @@ function startCarousel3D(count) {
       const cardAngle = ((i * angleStep + carouselAngle) % 360 + 360) % 360;
       const rad = cardAngle * Math.PI / 180;
 
-      // X position on circle (no Z axis — cards always face forward)
-      const x = Math.sin(rad) * radius;
-      // Depth simulated via scale and opacity only
-      const depth = (Math.cos(rad) + 1) / 2; // 0=back, 1=front
-      const scale = 0.55 + depth * 0.45;     // 0.55 at back, 1.0 at front
+      // X: compressed — multiply sin by 0.7 so the arc is flatter side-to-side
+      const x = Math.sin(rad) * radius * 0.7;
+
+      // Raw depth: 1 at front (0°), 0 at back (180°)
+      const rawDepth = (Math.cos(rad) + 1) / 2;
+
+      // Hard falloff — cards past ~100° from front become invisible fast
+      // Use a sharpened curve: raise to power 3 so rear cards collapse quickly
+      const depth = Math.pow(rawDepth, 3);
+
+      const scale = 0.5 + depth * 0.5;
 
       card.style.transform = `translateX(${x}px) scale(${scale})`;
-      card.style.opacity = String(0.2 + depth * 0.8);
+      // Opacity hits 0 well before cards reach the back — feels like they disappear off stage
+      card.style.opacity = String(Math.max(0, depth * 1.2 - 0.05));
       card.style.zIndex = String(Math.round(depth * 10));
 
-      const isFront = depth > 0.85;
+      const isFront = rawDepth > 0.85;
       card.classList.toggle("is-front", isFront);
     });
 
-    // Keep slider thumb in sync with rotation
     const pct = ((carouselAngle % 360) + 360) % 360 / 360;
     if (!carouselSliderDragging) updateSliderUI(pct);
 
