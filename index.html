@@ -1032,7 +1032,6 @@ function buildDetailPanel() {
 
   function onProbeSettled() {
     settledCount++;
-    console.log(`probe settled ${settledCount}/${totalProbes}`);
     if (settledCount >= totalProbes) {
       clearTimeout(fallbackTimer);
       setTimeout(dismissLoading, 80);
@@ -1040,7 +1039,6 @@ function buildDetailPanel() {
   }
 
   if (totalProbes === 0) {
-    console.log('no probes, dismissing immediately');
     clearTimeout(fallbackTimer);
     setTimeout(dismissLoading, 80);
   }
@@ -1068,8 +1066,8 @@ function buildDetailPanel() {
   ctrl.innerHTML = `<span class="carousel-count" id="carousel-count"></span>`;
   panel.appendChild(ctrl);
 
-
-  // Scroll wheel on photo viewer spins the carousel
+  // Show placeholder carousel immediately — rebuilds as real shots probe in
+  buildCarousel3D(panel);
   const viewer = document.getElementById("photo-viewer");
   if (viewer) {
     viewer.addEventListener("wheel", (e) => {
@@ -1156,9 +1154,6 @@ function buildDetailPanel() {
       }
     });
   }
-
-  // Show placeholder carousel immediately — rebuilds as real shots probe in
-  buildCarousel3D(panel);
 }
 
 function getDisplayUrls() {
@@ -1221,8 +1216,10 @@ function buildCarousel3D(panel) {
   const ctrl = document.getElementById("carousel-ctrl");
   panel.insertBefore(scene, ctrl);
 
-  document.getElementById("carousel-ctrl").style.display = "flex";
-  document.getElementById("carousel-count").textContent = detailLoaded.length > 0 ? detailLoaded.length + " SHOTS" : "NO PHOTOS";
+  const ctrlEl = document.getElementById("carousel-ctrl");
+  if (ctrlEl) ctrlEl.style.display = "flex";
+  const countEl = document.getElementById("carousel-count");
+  if (countEl) countEl.textContent = detailLoaded.length > 0 ? detailLoaded.length + " SHOTS" : "NO PHOTOS";
 
   startCarousel3D(tiledUrls.length, realCount);
 }
