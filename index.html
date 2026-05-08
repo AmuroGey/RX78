@@ -182,16 +182,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .panel-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0;}
 .panel-corner.bl{bottom:40px;left:8px;border-width:0 0 1px 1px;}
 .panel-corner.br{bottom:40px;right:8px;border-width:0 1px 1px 0;}
-.photo-viewer-loading{
-  position:absolute;inset:0;z-index:20;
-  display:flex;align-items:center;justify-content:center;
-  background:#050810;
-  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
-  color:var(--amber);text-transform:uppercase;
-  pointer-events:none;
-  transition:opacity 0.5s ease;
-}
-.photo-viewer-loading.hidden{opacity:0;pointer-events:none;}
+.panel-empty{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;text-align:center;background:#050810;}
 /* 3D CAROUSEL */
 .carousel-scene{
   position:absolute;inset:0;
@@ -231,32 +222,25 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .carousel-zoom.open{background:rgba(0,0,0,0.92);pointer-events:all;cursor:pointer;}
 .carousel-zoom-wrapper{
   position:relative;
-  max-height:90vh;
+  height:95vh;
+  width:auto;
   max-width:90vw;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:stretch;
   transform:scale(0.1);opacity:0;
   transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
   cursor:default;
-  line-height:0;
 }
 .carousel-zoom.open .carousel-zoom-wrapper{transform:scale(1);opacity:1;}
 .carousel-zoom-card{
   position:relative;
+  height:100%;width:auto;
   background:#0a1520;
   border:1px solid var(--amber);
   overflow:hidden;
   cursor:default;
-  display:inline-flex;align-items:center;justify-content:center;
-  line-height:0;
+  display:flex;align-items:center;justify-content:center;
 }
-.carousel-zoom-card img{
-  display:block;
-  max-height:90vh;
-  max-width:90vw;
-  width:auto;
-  height:auto;
-  object-fit:contain;
-}
+.carousel-zoom-card img{max-height:100%;max-width:100%;width:auto;height:auto;object-fit:contain;display:block;margin:auto;}
 .carousel-zoom-close{
   position:absolute;
   top:12px;right:12px;
@@ -477,8 +461,6 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
       <button class="modal-close" id="modal-close">&#10005;</button>
     </div>
     <div class="photo-viewer" id="photo-viewer">
-      <!-- Loading overlay -->
-      <div class="photo-viewer-loading" id="photo-viewer-loading">[ LOADING DATA ]</div>
       <!-- Detail carousel — background layer -->
       <div class="photo-viewer-detail" id="panel-detail"></div>
       <!-- Vignette overlay -->
@@ -934,10 +916,6 @@ function openModal(kit) {
 
   buildPhotoViewer(kit);
 
-  // Reset loading overlay for this kit
-  const loadingEl = document.getElementById("photo-viewer-loading");
-  if (loadingEl) loadingEl.classList.remove("done");
-
   document.getElementById("modal-bg").classList.add("open");
   document.body.style.overflow = "hidden";
   history.replaceState(null, "", "#" + kit.id);
@@ -1017,20 +995,7 @@ function buildDetailPanel() {
   // Probe images
   const probeContainer = document.createElement("div");
   probeContainer.style.display = "none";
-  const totalProbes = detailUrls.length;
-  let settledCount = 0;
-
-  // Show loading overlay
-  const loadingEl = document.getElementById("photo-viewer-loading");
-  if (loadingEl) { loadingEl.classList.remove("done"); loadingEl.textContent = "[ LOADING DATA ]"; }
-
-  function onProbeSettled() {
-    settledCount++;
-    if (settledCount >= totalProbes) {
-      // All probes done — dismiss overlay
-      if (loadingEl) loadingEl.classList.add("done");
-    }
-  }
+  let errorCount = 0;
 
   detailUrls.forEach((url, i) => {
     const probe = document.createElement("img");
@@ -1039,11 +1004,10 @@ function buildDetailPanel() {
       if (!detailLoaded.includes(i)) {
         detailLoaded.push(i);
         detailLoaded.sort((a,b) => a-b);
-        buildCarousel3D(panel);
+        buildCarousel3D(panel); // rebuild with real photos as they load
       }
-      onProbeSettled();
     };
-    probe.onerror = () => { onProbeSettled(); };
+    probe.onerror = () => { errorCount++; };
     probeContainer.appendChild(probe);
   });
   panel.appendChild(probeContainer);
