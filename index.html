@@ -1055,7 +1055,7 @@ function buildDetailPanel() {
       }
       e.preventDefault();
       dragSpinLastX = x;
-      carouselAngle += dx * 1.0;
+      carouselAngle -= dx * 1.0;
     };
     const onViewerDragEnd = () => {
       dragSpinPointerDown = false;
@@ -1186,28 +1186,25 @@ function startCarousel3D(count) {
     }
 
     // Spacing is card-width based so cards are always snug regardless of count
-    const spacingPx = cardW * 1.1;
+    const spacingPx = cardW * 1.02;
     const totalCycle = count * spacingPx;
-
-    // How many times the set needs to tile to cover viewer + 1 card each side
-    // We only have `count` DOM cards, so we let each card stand in for any tile
-    // by finding which tile slot it should occupy this frame
-    const visibleRange = viewerW + cardW * 2; // px we need covered
-    const tilesNeeded = Math.ceil(visibleRange / totalCycle) + 1;
 
     // Global offset: how far we've scrolled in px
     const offset = carouselAngle % totalCycle;
+
+    // Fade zone: cards must reach opacity 0 before totalCycle/2 from center
+    // Use half the total cycle as the fade distance so wrap is always invisible
+    const fadeEdge = Math.min(totalCycle * 0.5, halfW + cardW * 2);
 
     Array.from(ring.children).forEach((card, i) => {
       // Base position of this card in one cycle
       const baseX = i * spacingPx - offset;
 
       // Find the tile that puts this card closest to center
-      // i.e. shift by whichever multiple of totalCycle lands nearest 0
       const tileShift = Math.round(baseX / totalCycle) * totalCycle;
       const x = baseX - tileShift;
 
-      const dist = Math.abs(x) / (halfW + cardW);
+      const dist = Math.abs(x) / fadeEdge;
       const depth = Math.max(0, 1 - dist * 1.1);
       const depthSharp = Math.pow(depth, 1.8);
 
