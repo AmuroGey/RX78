@@ -19,8 +19,8 @@
 body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;min-height:100vh;overflow-x:hidden;}
 
 /* GUNDAM BG */
-#gundam-bg{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity 1.0s ease;overflow:hidden;}
-#gundam-bg img{height:100vh;width:auto;max-width:none;object-fit:contain;display:block;flex-shrink:0;}
+#gundam-bg{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity 1.0s ease;overflow:hidden;user-select:none;-webkit-user-select:none;}
+#gundam-bg img{height:100vh;width:auto;max-width:none;object-fit:contain;display:block;flex-shrink:0;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;}
 #gundam-inactive{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:8vh;}
 #gundam-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:8vh;opacity:0;transition:opacity 1.4s ease;}
 #gundam-active.visible{opacity:1;}
@@ -47,7 +47,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* LANDING */
-#landing{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;}
+#landing{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;user-select:none;-webkit-user-select:none;}
 #landing-gradient{position:absolute;left:0;right:0;bottom:0;height:75%;background:linear-gradient(to top,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.88) 30%,rgba(0,0,0,0.6) 60%,transparent 100%);pointer-events:none;opacity:0;transition:opacity 0.8s ease;}
 #landing-gradient.visible{opacity:1;}
 #landing-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:8vh;opacity:0;transition:opacity 0.8s ease;pointer-events:none;}
@@ -64,7 +64,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 #access-btn span{position:relative;z-index:1;transition:color 0.25s;}
 
 /* BOOT */
-#boot{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;justify-content:flex-end;padding:0 8vw 8vh;pointer-events:none;opacity:0;transition:opacity 0.4s ease;}
+#boot{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;justify-content:flex-end;padding:0 8vw 8vh;pointer-events:none;opacity:0;transition:opacity 0.4s ease;user-select:none;-webkit-user-select:none;}
 #boot.visible{opacity:1;}
 #boot-scan{position:absolute;left:0;right:0;height:2px;top:0;background:linear-gradient(90deg,transparent,var(--amber),transparent);box-shadow:0 0 16px rgba(232,160,32,0.7);opacity:0;transition:opacity 1.2s ease;}
 #boot-scan.go{animation:bootScanBounce 1.4s ease-in-out infinite;opacity:1;}
@@ -163,7 +163,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:140px;--card-h:340px;cursor:grab;user-select:none;-webkit-user-select:none;}
+.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:150px;--card-h:476px;cursor:grab;user-select:none;-webkit-user-select:none;}
 .photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
@@ -206,7 +206,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   will-change:transform,opacity;
   transform-origin:center center;
 }
-.carousel-card img{width:100%;height:100%;object-fit:contain;object-position:center center;display:block;}
+.carousel-card img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block;}
 .carousel-card:hover{border-color:rgba(232,160,32,0.7);box-shadow:0 0 20px rgba(232,160,32,0.15);}
 
 /* ZOOMED CARD */
@@ -270,7 +270,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 
 
 @media(min-width:701px) and (max-width:1100px){
-  .photo-viewer{height:340px;--card-w:100px;--card-h:220px;}
+  .photo-viewer{height:340px;--card-w:110px;--card-h:312px;}
 }
 /* FOOTER */
 .rx-footer{border-top:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:40px;background:rgba(0,0,0,0.6);}
@@ -319,7 +319,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .status-desktop{display:none;}
   .status-mobile{display:inline-block;}
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
-  .photo-viewer{height:220px;--card-w:80px;--card-h:170px;}
+  .photo-viewer{height:220px;--card-w:75px;--card-h:200px;}
   .panel-corner{width:10px;height:10px;}
   .photo-shot{width:38%;}
   #panel-front{left:2%;}
@@ -997,7 +997,7 @@ function buildDetailPanel() {
     const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
     // Map 0-1 across the full conveyor cycle (count * spacing in px)
     const viewerW = document.getElementById("photo-viewer").offsetWidth || 900;
-    const spacingPx = viewerW * 0.22;
+    const spacingPx = viewerW * 0.13;
     const totalRange = (document.getElementById("carousel-ring")?.children.length || 3) * spacingPx;
     carouselAngle = pct * totalRange;
     updateSliderUI(pct);
@@ -1012,7 +1012,7 @@ function buildDetailPanel() {
     const rect = track.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const viewerW = document.getElementById("photo-viewer").offsetWidth || 900;
-    const spacingPx = viewerW * 0.22;
+    const spacingPx = viewerW * 0.13;
     const totalRange = (document.getElementById("carousel-ring")?.children.length || 3) * spacingPx;
     carouselAngle = pct * totalRange;
     updateSliderUI(pct);
@@ -1087,14 +1087,13 @@ function buildDetailPanel() {
 
 function getDisplayUrls() {
   const loaded = detailLoaded.map(i => detailUrls[i]);
-  const MIN = 3;
+  const MIN = 6;
   if (loaded.length === 0) {
-    // Return placeholder sentinel values
     return Array.from({ length: MIN }, (_, i) => ({ placeholder: true, idx: i }));
   }
-  // Repeat to fill minimum 3 slots
+  // Repeat set until we have at least MIN cards
   const result = [];
-  while (result.length < Math.max(MIN, loaded.length)) result.push(...loaded);
+  while (result.length < MIN) result.push(...loaded);
   return result.slice(0, Math.max(MIN, loaded.length)).map(url => ({ placeholder: false, url }));
 }
 
@@ -1163,7 +1162,7 @@ function startCarousel3D(count) {
   // carouselAngle is repurposed as a continuous offset (0-1 = one full card spacing)
   const VISIBLE = 3;
   // spacing between card centers as a fraction of viewer width
-  const SPACING = 0.22;
+  const SPACING = 0.13;
 
   function tick() {
     const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
