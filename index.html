@@ -164,7 +164,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-notes-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
 
 /* PHOTO VIEWER */
-.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:150px;--card-h:476px;cursor:grab;user-select:none;-webkit-user-select:none;}
+.photo-viewer{position:relative;height:520px;background:#050810;border-bottom:1px solid var(--border);overflow:hidden;--card-w:185px;--card-h:476px;cursor:grab;user-select:none;-webkit-user-select:none;}
 .photo-viewer:active{cursor:grabbing;}
 .photo-viewer-detail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
 .photo-viewer-detail img{width:100%;height:100%;object-fit:cover;transition:opacity 0.4s ease;}
@@ -261,7 +261,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 
 
 @media(min-width:701px) and (max-width:1100px){
-  .photo-viewer{height:340px;--card-w:110px;--card-h:312px;}
+  .photo-viewer{height:340px;--card-w:135px;--card-h:312px;}
 }
 /* FOOTER */
 .rx-footer{border-top:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:40px;background:rgba(0,0,0,0.6);}
@@ -320,7 +320,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .status-desktop{display:none;}
   .status-mobile{display:inline-block;}
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
-  .photo-viewer{height:220px;--card-w:75px;--card-h:200px;}
+  .photo-viewer{height:220px;--card-w:90px;--card-h:200px;}
   .panel-corner{width:10px;height:10px;}
   .photo-shot{width:38%;}
   #panel-front{left:2%;}
@@ -1055,7 +1055,7 @@ function buildDetailPanel() {
       }
       e.preventDefault();
       dragSpinLastX = x;
-      carouselAngle -= dx * 1.0;
+      carouselAngle += dx * 1.0;
     };
     const onViewerDragEnd = () => {
       dragSpinPointerDown = false;
@@ -1113,14 +1113,10 @@ function buildDetailPanel() {
 
 function getDisplayUrls() {
   const loaded = detailLoaded.map(i => detailUrls[i]);
-  const MIN = 6;
   if (loaded.length === 0) {
-    return Array.from({ length: MIN }, (_, i) => ({ placeholder: true, idx: i }));
+    return Array.from({ length: 4 }, (_, i) => ({ placeholder: true, idx: i }));
   }
-  // Repeat set until we have at least MIN cards
-  const result = [];
-  while (result.length < MIN) result.push(...loaded);
-  return result.slice(0, Math.max(MIN, loaded.length)).map(url => ({ placeholder: false, url }));
+  return loaded.map(url => ({ placeholder: false, url }));
 }
 
 function buildCarousel3D(panel) {
@@ -1180,40 +1176,38 @@ function startCarousel3D(count) {
   const ring = document.getElementById("carousel-ring");
   if (!ring) return;
 
-  // conveyor belt: each card has a position in a virtual "slot" lane
-  // lane goes from -0.5 (left edge, just offscreen) to +0.5 (right edge)
-  // 3 cards are always visible; extras sit in the queue off-screen right
-  // when a card exits left it teleports to the back of the right queue
-
-  const SPACING = 0.13;
-
   function tick() {
     const viewerW = ring.parentElement ? ring.parentElement.offsetWidth : 900;
     const cardW = ring.children[0] ? ring.children[0].offsetWidth : 150;
     const halfW = viewerW * 0.5;
-    const exitEdge = halfW + cardW * 0.6;
 
     if (!carouselPaused) {
       carouselAngle += carouselSpeed;
     }
 
-    // Normalize to a 0–1 phase across one full cycle (count cards)
-    // carouselAngle in px, one cycle = count * spacingPx
-    const spacingPx = viewerW * SPACING;
+    // Spacing is card-width based so cards are always snug regardless of count
+    const spacingPx = cardW * 1.1;
     const totalCycle = count * spacingPx;
-    const phase = ((carouselAngle % totalCycle) + totalCycle) % totalCycle / totalCycle;
+
+    // How many times the set needs to tile to cover viewer + 1 card each side
+    // We only have `count` DOM cards, so we let each card stand in for any tile
+    // by finding which tile slot it should occupy this frame
+    const visibleRange = viewerW + cardW * 2; // px we need covered
+    const tilesNeeded = Math.ceil(visibleRange / totalCycle) + 1;
+
+    // Global offset: how far we've scrolled in px
+    const offset = carouselAngle % totalCycle;
 
     Array.from(ring.children).forEach((card, i) => {
-      // Each card's phase offset, evenly distributed around the 0–1 cycle
-      let p = (phase + i / count) % 1;
-      // Map phase to pixel position: 0=right entry, 0.5=center, 1=left exit
-      // Remap so center of screen is at phase=0.5
-      let x = (p - 0.5) * totalCycle;
+      // Base position of this card in one cycle
+      const baseX = i * spacingPx - offset;
 
-      // If a card is in the invisible back half (too far left or right), 
-      // it's already wrapped by the modulo — nothing extra needed.
-      // Fade/scale by distance from center
-      const dist = Math.abs(x) / exitEdge;
+      // Find the tile that puts this card closest to center
+      // i.e. shift by whichever multiple of totalCycle lands nearest 0
+      const tileShift = Math.round(baseX / totalCycle) * totalCycle;
+      const x = baseX - tileShift;
+
+      const dist = Math.abs(x) / (halfW + cardW);
       const depth = Math.max(0, 1 - dist * 1.1);
       const depthSharp = Math.pow(depth, 1.8);
 
