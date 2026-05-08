@@ -1204,7 +1204,12 @@ function startCarousel3D(count, realCount) {
       const depth = Math.max(0, 1 - dist);
       const depthSharp = Math.pow(depth, 1.4);
 
-      card.style.transform = `translateX(${x}px) scale(${0.6 + depthSharp * 0.4})`;
+      // Arc: cards curve downward away from center (parabolic Y offset)
+      const arcY = dist * dist * cardW * 1.4;
+      // Scale: center card notably bigger than sides
+      const scale = 0.45 + depthSharp * 0.55;
+
+      card.style.transform = `translateX(${x}px) translateY(${arcY}px) scale(${scale})`;
       card.style.opacity = String(Math.max(0, depthSharp * 1.1 - 0.05));
       card.style.zIndex = String(Math.round(depthSharp * 10));
       card.classList.toggle("is-front", dist < 0.12);
