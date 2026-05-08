@@ -1017,29 +1017,34 @@ function buildDetailPanel() {
   // Probe images
   const probeContainer = document.createElement("div");
   probeContainer.style.display = "none";
+  panel.appendChild(probeContainer);
+
   const totalProbes = detailUrls.length;
   let settledCount = 0;
 
-  const loadingEl = document.getElementById("photo-viewer-loading");
+  function dismissLoading() {
+    const el = document.getElementById("photo-viewer-loading");
+    if (el) el.classList.add("done");
+  }
+
+  // Hard fallback — always dismiss after 4s no matter what
+  const fallbackTimer = setTimeout(dismissLoading, 4000);
 
   function onProbeSettled() {
     settledCount++;
     if (settledCount >= totalProbes) {
-      // Small defer so the carousel has a frame to render before overlay fades
-      setTimeout(() => {
-        if (loadingEl) loadingEl.classList.add("done");
-      }, 120);
+      clearTimeout(fallbackTimer);
+      setTimeout(dismissLoading, 80);
     }
   }
 
-  // If no urls to probe at all, dismiss immediately
   if (totalProbes === 0) {
-    setTimeout(() => { if (loadingEl) loadingEl.classList.add("done"); }, 120);
+    clearTimeout(fallbackTimer);
+    setTimeout(dismissLoading, 80);
   }
 
   detailUrls.forEach((url, i) => {
     const probe = document.createElement("img");
-    probe.src = url;
     probe.onload = () => {
       if (!detailLoaded.includes(i)) {
         detailLoaded.push(i);
@@ -1048,10 +1053,10 @@ function buildDetailPanel() {
       }
       onProbeSettled();
     };
-    probe.onerror = () => { onProbeSettled(); };
+    probe.onerror = () => onProbeSettled();
+    probe.src = url;
     probeContainer.appendChild(probe);
   });
-  panel.appendChild(probeContainer);
 
   // Add carousel controls immediately (hidden until shots load)
   const ctrl = document.createElement("div");
