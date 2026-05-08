@@ -1027,11 +1027,12 @@ function buildDetailPanel() {
     if (el) el.classList.add("done");
   }
 
-  // Hard fallback — always dismiss after 4s no matter what
-  const fallbackTimer = setTimeout(dismissLoading, 4000);
+  // Hard fallback — safety net only, should never be needed in practice
+  const fallbackTimer = setTimeout(dismissLoading, 30000);
 
   function onProbeSettled() {
     settledCount++;
+    console.log(`probe settled ${settledCount}/${totalProbes}`);
     if (settledCount >= totalProbes) {
       clearTimeout(fallbackTimer);
       setTimeout(dismissLoading, 80);
@@ -1039,6 +1040,7 @@ function buildDetailPanel() {
   }
 
   if (totalProbes === 0) {
+    console.log('no probes, dismissing immediately');
     clearTimeout(fallbackTimer);
     setTimeout(dismissLoading, 80);
   }
