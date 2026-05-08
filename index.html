@@ -1185,16 +1185,17 @@ function startCarousel3D(count) {
       carouselAngle += carouselSpeed;
     }
 
-    // Spacing is card-width based so cards are always snug regardless of count
     const spacingPx = cardW * 1.02;
-    const totalCycle = count * spacingPx;
+    // We want fadeEdge = halfW + cardW*3 for a generous spread.
+    // totalCycle must be >= fadeEdge*2 so halfCycle >= fadeEdge (no clamp needed).
+    // Achieve this by padding the cycle with extra ghost slots beyond the real cards.
+    const wantedFade = halfW + cardW * 3;
+    const minCycle = wantedFade * 2 + spacingPx;
+    const totalCycle = Math.max(count * spacingPx, minCycle);
+    const halfCycle = totalCycle * 0.5;
+    const fadeEdge = wantedFade; // always <= halfCycle by construction
 
-    // Global offset: how far we've scrolled in px
     const offset = carouselAngle % totalCycle;
-
-    // fadeEdge is where opacity reaches 0 — must be <= totalCycle/2 so the
-    // fade hits zero before/at the wrap point, eliminating pop-in entirely
-    const fadeEdge = Math.min(halfW + cardW * 4, totalCycle * 0.5);
 
     Array.from(ring.children).forEach((card, i) => {
       const baseX = i * spacingPx - offset;
