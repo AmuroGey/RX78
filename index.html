@@ -316,47 +316,47 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 
 /* DESKTOP LARGE */
 @media(min-width:1101px){
-  html{font-size:18px;}
-  body{font-size:18px;}
-  .toolbar{padding:36px 64px 0;gap:18px;}
-  .drop-btn{font-size:16px;padding:12px 28px;letter-spacing:3px;}
-  .drop-item{font-size:15px;padding:14px 28px;letter-spacing:2px;}
-  .rx-search{font-size:15px;padding:10px 22px;width:340px;}
-  .section-header{padding:36px 64px 26px;}
-  .section-label{font-size:15px;letter-spacing:6px;}
-  .section-count{font-size:15px;}
+  html{font-size:14px;}
+  body{font-size:14px;}
+  .toolbar{padding:28px 64px 0;gap:14px;}
+  .drop-btn{font-size:12px;padding:10px 22px;letter-spacing:2px;}
+  .drop-item{font-size:12px;padding:11px 22px;letter-spacing:1px;}
+  .rx-search{font-size:12px;padding:8px 18px;width:260px;}
+  .section-header{padding:28px 64px 20px;}
+  .section-label{font-size:12px;letter-spacing:5px;}
+  .section-count{font-size:12px;}
   .list-header{grid-template-columns:220px 1fr 120px 170px;padding:0 64px;}
-  .list-header-cell{font-size:13px;padding:13px 24px;letter-spacing:3px;}
-  .grade-header{padding:16px 64px;}
-  .grade-badge{font-size:15px;padding:5px 16px;letter-spacing:3px;}
-  .grade-title{font-size:18px;letter-spacing:6px;}
-  .grade-n{font-size:16px;}
-  .kit-list{padding:0 64px 10px;}
+  .list-header-cell{font-size:11px;padding:11px 24px;letter-spacing:2px;}
+  .grade-header{padding:14px 64px;}
+  .grade-badge{font-size:16px !important;padding:5px 16px;letter-spacing:3px;}
+  .grade-title{font-size:20px !important;letter-spacing:6px;}
+  .grade-n{font-size:14px;}
+  .kit-list{padding:0 64px 8px;}
   .kit-row{grid-template-columns:220px 1fr 120px 170px;}
-  .kit-cell{padding:18px 24px;font-size:16px;}
-  .kit-mold{font-size:18px;}
-  .kit-year{font-size:17px;}
-  .status-pip{font-size:13px;padding:4px 12px;letter-spacing:2px;}
-  .rx-tag{font-size:13px;padding:4px 10px;}
+  .kit-cell{padding:14px 24px;font-size:13px;}
+  .kit-mold{font-size:14px;}
+  .kit-year{font-size:13px;}
+  .status-pip{font-size:11px;padding:3px 10px;letter-spacing:1px;}
+  .rx-tag{font-size:11px;padding:3px 8px;}
   .modal{max-width:1460px;}
-  .modal-header{padding:38px 56px 32px;}
-  .modal-grade{font-size:16px;letter-spacing:5px;padding:6px 18px;}
-  .modal-mold{font-size:44px;}
-  .modal-variant{font-size:24px;}
-  .modal-left{padding:52px;}
-  .modal-right{padding:52px;}
-  .modal-sec{font-size:15px;letter-spacing:5px;margin-bottom:18px;}
-  .modal-row{font-size:18px;padding:14px 0;}
-  .modal-key{font-size:16px;letter-spacing:2px;}
-  .modal-val{font-size:18px;}
-  .modal-notes{padding:36px 56px;font-size:19px;line-height:2;}
-  .modal-notes-label{font-size:14px;letter-spacing:4px;}
+  .modal-header{padding:30px 56px 26px;}
+  .modal-grade{font-size:13px;letter-spacing:4px;padding:5px 16px;}
+  .modal-mold{font-size:36px;}
+  .modal-variant{font-size:19px;}
+  .modal-left{padding:44px;}
+  .modal-right{padding:44px;}
+  .modal-sec{font-size:12px;letter-spacing:4px;margin-bottom:14px;}
+  .modal-row{font-size:14px;padding:11px 0;}
+  .modal-key{font-size:13px;letter-spacing:1px;}
+  .modal-val{font-size:14px;}
+  .modal-notes{padding:28px 56px;font-size:15px;line-height:1.8;}
+  .modal-notes-label{font-size:12px;letter-spacing:3px;}
   .photo-viewer{height:680px;--card-w:245px;--card-h:636px;}
   .photo-shot{width:28%;}
   #panel-front{left:16%;}
   #panel-back{right:16%;}
-  .panel-spec-label{font-size:13px;letter-spacing:3px;}
-  .panel-spec-val{font-size:16px;}
+  .panel-spec-label{font-size:11px;letter-spacing:2px;}
+  .panel-spec-val{font-size:13px;}
 }
 
 /* MOBILE */
@@ -891,7 +891,7 @@ function renderRegistry() {
     header.className = "grade-header";
     header.style.borderLeftColor = c;
     header.innerHTML = `
-      <span class="grade-title" style="color:${c};letter-spacing:4px;font-size:11px;">${GRADE_NAMES[grade]||grade}</span>
+      <span class="grade-title" style="color:${c};letter-spacing:4px;">${GRADE_NAMES[grade]||grade}</span>
       <span class="grade-n">${items.length} KIT${items.length!==1?"S":""}</span>
       <span class="grade-chevron${collapsed[grade]?"":" open"}">&#9658;</span>
     `;
@@ -912,7 +912,7 @@ function renderRegistry() {
       const tags = (kit.tags||[]).map(t => `<span class="rx-tag">${t}</span>`).join("");
       row.innerHTML = `
         <div class="kit-cell">
-          <span class="grade-badge" style="color:${c};border-color:${c};background:${c}10;font-size:9px">${kit.grade}</span>
+          <span class="grade-badge" style="color:${c};border-color:${c};background:${c}10;">${kit.grade}</span>
         </div>
         <div class="kit-cell" style="flex-direction:column;align-items:flex-start;gap:4px;">
           <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
