@@ -341,8 +341,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .modal{max-width:1460px;}
   .modal-header{padding:30px 56px 26px;}
   .modal-grade{font-size:13px;letter-spacing:4px;padding:5px 16px;}
-  .modal-mold{font-size:36px;}
-  .modal-variant{font-size:19px;}
+  .modal-mold{font-size:40px;}
+  .modal-variant{font-size:21px;}
   .modal-left{padding:44px;}
   .modal-right{padding:44px;}
   .modal-sec{font-size:12px;letter-spacing:4px;margin-bottom:14px;}
@@ -566,6 +566,7 @@ const ANIM_COOLDOWN_MS = 5 * 60 * 1000;
 const MAX_DETAIL_SHOTS = 20;
 const GRADE_COLOR = { SD:"#4a90e8", EG:"#4abfdf", HG:"#40c8a0", RG:"#40c870", MG:"#e8c020", PG:"#e8820a", MEGASIZE:"#e85420", MISC:"#e84040" };
 const GRADE_NAMES = { SD:"SUPER DEFORMED", EG:"ENTRY GRADE", HG:"HIGH GRADE", RG:"REAL GRADE", MG:"MASTER GRADE", PG:"PERFECT GRADE", MEGASIZE:"MEGASIZE MODEL", MISC:"MISCELLANEOUS" };
+const GRADE_BADGE = { SD:"SD", EG:"EG", HG:"HG", RG:"RG", MG:"MG", PG:"PG", MEGASIZE:"MSM", MISC:"MISC" };
 const STATUS_COLOR = { built:"#40c870", backlog:"#e8a020", custom:"#d060e0" };
 const STATUS_LABEL = { built:"BUILT", backlog:"BACKLOG", custom:"CUSTOM" };
 const GRADE_ORDER = ["SD","EG","HG","RG","MG","PG","MEGASIZE","MISC"];
@@ -912,7 +913,7 @@ function renderRegistry() {
       const tags = (kit.tags||[]).map(t => `<span class="rx-tag">${t}</span>`).join("");
       row.innerHTML = `
         <div class="kit-cell">
-          <span class="grade-badge" style="color:${c};border-color:${c};background:${c}10;">${kit.grade}</span>
+          <span class="grade-badge" style="color:${c};border-color:${c};background:${c}10;">${GRADE_BADGE[kit.grade]||kit.grade}</span>
         </div>
         <div class="kit-cell" style="flex-direction:column;align-items:flex-start;gap:4px;">
           <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
