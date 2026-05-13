@@ -369,6 +369,14 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .modal-val{font-size:14px;}
   .modal-notes{padding:28px 56px;font-size:15px;line-height:1.8;}
   .modal-notes-label{font-size:12px;letter-spacing:3px;}
+  /* Stretch spec box full drawer height, triple fonts */
+  .drawer-content{display:flex;flex-direction:column;}
+  .modal-body{flex:1;min-height:0;}
+  .modal-left{display:flex;flex-direction:column;overflow-y:auto;}
+  .modal-left .modal-sec{font-size:36px;letter-spacing:4px;flex-shrink:0;}
+  .modal-left .modal-row{font-size:42px;padding:22px 0;}
+  .modal-left .modal-key{font-size:38px;}
+  .modal-left .modal-val{font-size:42px;}
   .photo-viewer{--card-w:368px;--card-h:calc(90vh - 44px);}
   .photo-shot{width:36%;height:154%;bottom:-5%;}
   #panel-front{left:12%;}
@@ -1108,7 +1116,7 @@ function buildDetailPanel() {
   loadingTimer = setTimeout(() => {
     const el = document.getElementById("photo-viewer-loading");
     if (el) el.classList.add("done");
-  }, 6000);
+  }, 4000);
 
   detailUrls.forEach((url, i) => {
     const probe = document.createElement("img");
