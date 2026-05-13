@@ -147,13 +147,11 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
 .modal-bg.open{display:flex;animation:fadeIn 0.2s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.modal{background:#050810;border:1px solid var(--border-bright);max-width:1100px;width:100%;height:90vh;position:relative;overflow:hidden;}
+.modal{background:#050810;border:1px solid var(--border-bright);max-width:1100px;width:100%;height:90vh;position:relative;overflow:hidden;flex-shrink:0;}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--amber);z-index:30;}
-.modal-close{position:absolute;top:12px;right:12px;z-index:25;background:rgba(5,8,16,0.8);border:1px solid var(--border);color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:16px;transition:all 0.2s;font-family:monospace;}
-.modal-close:hover{border-color:var(--amber);color:var(--amber);}
 
 /* PHOTO VIEWER — fills entire modal */
-.photo-viewer{position:absolute;inset:0;background:#050810;overflow:hidden;--card-w:185px;--card-h:460px;cursor:grab;user-select:none;-webkit-user-select:none;}
+.photo-viewer{position:absolute;inset:0;bottom:44px;background:#050810;overflow:hidden;--card-w:185px;--card-h:460px;cursor:grab;user-select:none;-webkit-user-select:none;}
 .photo-viewer:active{cursor:grabbing;}
 
 /* TITLE OVERLAY on photobox */
@@ -162,14 +160,17 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-mold{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--amber);}
 .modal-variant{font-family:'Share Tech',sans-serif;font-size:16px;color:var(--text-bright);margin-top:4px;}
 
+.modal-close{position:absolute;top:12px;right:12px;z-index:25;background:rgba(5,8,16,0.8);border:1px solid var(--border);color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:16px;transition:all 0.2s;font-family:monospace;}
+.modal-close:hover{border-color:var(--amber);color:var(--amber);}
+
 /* TOGGLE — always pinned at bottom of modal */
 .drawer-toggle{position:absolute;bottom:0;left:0;right:0;z-index:22;height:44px;background:rgba(5,8,16,0.92);border:none;border-top:1px solid var(--border-bright);color:var(--amber);font-size:20px;cursor:pointer;width:100%;transition:background 0.2s;backdrop-filter:blur(8px);}
 .drawer-toggle:hover{background:rgba(10,16,28,0.98);}
 
-/* DRAWER — slides up from below the toggle */
-.modal-drawer{position:absolute;bottom:44px;left:0;right:0;z-index:21;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);}
-.modal-drawer.open{transform:translateY(0);}
-.drawer-content{background:var(--bg2);overflow-y:auto;max-height:calc(90vh - 44px);}
+/* DRAWER — slides up from bottom, covers full modal when open */
+.modal-drawer{position:absolute;top:100%;left:0;right:0;bottom:44px;z-index:21;transition:top 0.4s cubic-bezier(0.32,0.72,0,1);}
+.modal-drawer.open{top:0;}
+.drawer-content{height:100%;background:var(--bg2);overflow-y:auto;}
 .drawer-content::-webkit-scrollbar{width:4px;}
 .drawer-content::-webkit-scrollbar-track{background:transparent;}
 .drawer-content::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:2px;}
@@ -404,7 +405,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .rx-footer{padding:12px;flex-direction:column;gap:4px;text-align:center;font-size:9px;}
   .photo-viewer{--card-w:90px;--card-h:200px;}
   .panel-corner{width:10px;height:10px;}
-  .photo-shot{width:38%;}
+  .photo-shot{bottom:0%;height:100%;}
   #panel-front{left:2%;}
   #panel-back{right:2%;}
   .modal-body{grid-template-columns:1fr;}
