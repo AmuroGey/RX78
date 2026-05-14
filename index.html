@@ -564,6 +564,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
         <div class="photo-shot" id="panel-hero">
           <img id="hero-front" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;opacity:0;transition:opacity 0.5s ease;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));">
           <img id="hero-back"  style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;opacity:0;transition:opacity 0.5s ease;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));">
+          <canvas id="hero-reflection" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);pointer-events:none;z-index:2;opacity:0.45;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);transition:opacity 0.5s ease;"></canvas>
         </div>
       </div>
       <button class="flip-btn" id="flip-btn">[ FLIP ]</button>
@@ -1061,6 +1062,7 @@ function buildPhotoViewer(kit) {
     const { canvas, ctx } = makeCanvas(frontImg);
     hero._hitFront = { canvas, ctx, img: frontImg };
     hero._zoomUrl = frontImg.src;
+    drawReflection(hero._hitFront);
   };
   backImg.onload = () => {
     const { canvas, ctx } = makeCanvas(backImg);
@@ -1082,6 +1084,7 @@ function buildPhotoViewer(kit) {
     newBtn.textContent = showingFront ? "[ FRONT ]" : "[ BACK ]";
     const active = showingFront ? hero._hitFront : hero._hitBack;
     hero._zoomUrl = active ? active.img.src : null;
+    drawReflection(active);
   });
 
   // Detail panel
@@ -1121,6 +1124,86 @@ function sampleHeroAlpha(hero, clientX, clientY) {
   const cx = Math.round((rx / rendW) * natW);
   const cy = Math.round((ry / rendH) * natH);
   return showing.ctx.getImageData(cx, cy, 1, 1).data[3] > 20;
+}
+
+function drawReflection(hitData) {
+  const canvas = document.getElementById("hero-reflection");
+  if (!canvas || !hitData) return;
+  const src = hitData.canvas;
+  const natW = src.width, natH = src.height;
+
+  // Reflection height = 30% of source image height
+  const refH = Math.round(natH * 0.30);
+  const refW = natW;
+
+  canvas.width  = refW;
+  canvas.height = refH;
+
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, refW, refH);
+
+  // Draw the bottom portion of the source image, flipped vertically
+  ctx.save();
+  ctx.translate(0, refH);
+  ctx.scale(1, -1);
+  // Draw only bottom 30% of source (where the kit feet are)
+  ctx.drawImage(src, 0, natH - refH, refW, refH, 0, 0, refW, refH);
+  ctx.restore();
+
+  // Blur via stack blur approximation — repeated box blur passes
+  stackBlurCanvas(canvas, 0, 0, refW, refH, 18);
+
+  // Size the canvas element to match rendered image width
+  const img = hitData.img;
+  const rect = img.getBoundingClientRect();
+  const heroRect = document.getElementById("panel-hero").getBoundingClientRect();
+  const scaleX = rect.width / natW;
+  const scaleY = rect.height / natH;
+  const scale  = Math.min(scaleX, scaleY);
+  const rendW  = natW * scale;
+  const rendH  = natH * scale;
+  const rendRefH = refH * scale;
+
+  canvas.style.width  = rendW + "px";
+  canvas.style.height = rendRefH + "px";
+}
+
+// Simple box blur for canvas (3-pass approximation of Gaussian)
+function stackBlurCanvas(canvas, x, y, w, h, radius) {
+  const ctx = canvas.getContext("2d");
+  const passes = 3;
+  for (let p = 0; p < passes; p++) {
+    const img = ctx.getImageData(x, y, w, h);
+    const d = img.data;
+    const r = Math.max(1, Math.round(radius / passes));
+    // Horizontal pass
+    for (let row = 0; row < h; row++) {
+      for (let col = 0; col < w; col++) {
+        let rr=0,g=0,b=0,a=0,cnt=0;
+        for (let k=-r;k<=r;k++) {
+          const c = Math.min(w-1,Math.max(0,col+k));
+          const i = (row*w+c)*4;
+          rr+=d[i];g+=d[i+1];b+=d[i+2];a+=d[i+3];cnt++;
+        }
+        const i=(row*w+col)*4;
+        d[i]=rr/cnt;d[i+1]=g/cnt;d[i+2]=b/cnt;d[i+3]=a/cnt;
+      }
+    }
+    // Vertical pass
+    for (let col = 0; col < w; col++) {
+      for (let row = 0; row < h; row++) {
+        let rr=0,g=0,b=0,a=0,cnt=0;
+        for (let k=-r;k<=r;k++) {
+          const ro = Math.min(h-1,Math.max(0,row+k));
+          const i = (ro*w+col)*4;
+          rr+=d[i];g+=d[i+1];b+=d[i+2];a+=d[i+3];cnt++;
+        }
+        const i=(row*w+col)*4;
+        d[i]=rr/cnt;d[i+1]=g/cnt;d[i+2]=b/cnt;d[i+3]=a/cnt;
+      }
+    }
+    ctx.putImageData(img, x, y);
+  }
 }
 
 function buildDetailPanel() {
