@@ -564,7 +564,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
         <div class="photo-shot" id="panel-hero">
           <img id="hero-front" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;opacity:0;transition:opacity 0.5s ease;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));">
           <img id="hero-back"  style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;opacity:0;transition:opacity 0.5s ease;filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95));">
-          <canvas id="hero-reflection" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);pointer-events:none;z-index:2;opacity:0.45;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);transition:opacity 0.5s ease;"></canvas>
+          <canvas id="hero-reflection" style="position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;z-index:2;opacity:0.45;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,0.6) 0%,transparent 100%);transition:opacity 0.5s ease;"></canvas>
         </div>
       </div>
       <button class="flip-btn" id="flip-btn">[ FLIP ]</button>
@@ -1162,15 +1162,14 @@ function drawReflection(hitData) {
   const rendH  = natH * scale;
   const rendRefH = refH * scale;
 
-  // Feet land at bottom of rendered image (object-position:center bottom)
-  // imgRect.bottom is feet position in viewport coords
-  // Convert to offset from hero element bottom
-  const feetFromHeroBottom = heroRect.bottom - imgRect.bottom;
+  // Feet land at imgRect.bottom. Convert to offset from hero element top.
+  const feetFromHeroTop = imgRect.bottom - heroRect.top;
 
   canvas.style.width   = rendW + "px";
   canvas.style.height  = rendRefH + "px";
-  // Position: bottom edge of canvas = feet of kit
-  canvas.style.bottom  = feetFromHeroBottom + "px";
+  // Top of canvas = feet of kit, reflection extends downward
+  canvas.style.top     = feetFromHeroTop + "px";
+  canvas.style.bottom  = "auto";
   canvas.style.left    = "50%";
   canvas.style.transform = "translateX(-50%)";
 }
