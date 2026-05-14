@@ -636,6 +636,7 @@ let carouselPaused = false;
 let carouselResumeTimer = null;
 let loadingTimer = null;
 let carouselZoomedUrl = null;
+let dragJustEnded = false;
 let carouselZoomedIdx = null;
 
 // ── INIT ────────────────────────────────────────────────────────────────────
@@ -1169,7 +1170,7 @@ function drawReflection(hitData) {
 
   const feetFromHeroTop = imgRect.bottom - heroRect.top;
   const isMobile = window.innerWidth <= 700;
-  const offset = isMobile ? 17 : 32;
+  const offset = isMobile ? 12 : 27;
 
   canvas.style.width   = rendW + "px";
   canvas.style.height  = rendRefH + "px";
@@ -1272,7 +1273,6 @@ function buildDetailPanel() {
     let dragSpinActive = false;
     let dragSpinLastX = 0;
     let dragSpinStartX = 0;
-    let dragJustEnded = false;
     const DRAG_THRESHOLD = 6;
 
     const onViewerDragStart = (e) => {
@@ -1390,7 +1390,7 @@ function buildCarousel3D(panel) {
       img.src = entry.url;
       img.alt = "";
       card.appendChild(img);
-      card.addEventListener("click", () => openZoom(entry.url, entry.realIdx));
+      card.addEventListener("click", () => { if (dragJustEnded) return; openZoom(entry.url, entry.realIdx); });
     }
 
     ring.appendChild(card);
