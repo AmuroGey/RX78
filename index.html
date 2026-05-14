@@ -1272,6 +1272,7 @@ function buildDetailPanel() {
     let dragSpinActive = false;
     let dragSpinLastX = 0;
     let dragSpinStartX = 0;
+    let dragJustEnded = false;
     const DRAG_THRESHOLD = 6;
 
     const onViewerDragStart = (e) => {
@@ -1299,6 +1300,8 @@ function buildDetailPanel() {
       dragSpinPointerDown = false;
       if (dragSpinActive) {
         dragSpinActive = false;
+        dragJustEnded = true;
+        setTimeout(() => { dragJustEnded = false; }, 50);
         viewer.style.cursor = "grab";
         scheduleResume();
       }
@@ -1327,7 +1330,7 @@ function buildDetailPanel() {
       if (hero && hero._hitBack)  hero._hitBack.img.classList.remove("hovered");
     });
     viewer.addEventListener("click", (e) => {
-      if (dragSpinActive) return;
+      if (dragSpinActive || dragJustEnded) return;
       const hero = document.getElementById("panel-hero");
       if (hero && hero._zoomUrl && sampleHeroAlpha(hero, e.clientX, e.clientY)) {
         e.stopPropagation();
