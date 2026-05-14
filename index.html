@@ -1096,11 +1096,30 @@ function sampleHeroAlpha(hero, clientX, clientY) {
   const showing = parseFloat(document.getElementById("hero-front")?.style.opacity) > 0.5
     ? hero._hitFront : hero._hitBack;
   if (!showing) return false;
-  const rect = showing.img.getBoundingClientRect();
-  const rx = clientX - rect.left, ry = clientY - rect.top;
-  if (rx < 0 || ry < 0 || rx > rect.width || ry > rect.height) return false;
-  const cx = Math.round((rx / rect.width)  * showing.canvas.width);
-  const cy = Math.round((ry / rect.height) * showing.canvas.height);
+
+  const img = showing.img;
+  const rect = img.getBoundingClientRect();
+  const natW = showing.canvas.width;
+  const natH = showing.canvas.height;
+
+  // Compute actual rendered image size within element (object-fit:contain)
+  const scaleX = rect.width  / natW;
+  const scaleY = rect.height / natH;
+  const scale  = Math.min(scaleX, scaleY);
+  const rendW  = natW * scale;
+  const rendH  = natH * scale;
+
+  // object-position:center bottom → horizontally centered, bottom-aligned
+  const offX = (rect.width  - rendW) / 2;
+  const offY =  rect.height - rendH;      // bottom-aligned
+
+  // Cursor relative to rendered image
+  const rx = clientX - rect.left - offX;
+  const ry = clientY - rect.top  - offY;
+  if (rx < 0 || ry < 0 || rx > rendW || ry > rendH) return false;
+
+  const cx = Math.round((rx / rendW) * natW);
+  const cy = Math.round((ry / rendH) * natH);
   return showing.ctx.getImageData(cx, cy, 1, 1).data[3] > 20;
 }
 
