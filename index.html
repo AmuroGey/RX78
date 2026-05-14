@@ -1168,7 +1168,7 @@ function drawReflection(hitData) {
   canvas.style.width   = rendW + "px";
   canvas.style.height  = rendRefH + "px";
   // Top of canvas = feet of kit, reflection extends downward
-  canvas.style.top     = feetFromHeroTop + "px";
+  canvas.style.top = (feetFromHeroTop - 40) + "px";
   canvas.style.bottom  = "auto";
   canvas.style.left    = "50%";
   canvas.style.transform = "translateX(-50%)";
