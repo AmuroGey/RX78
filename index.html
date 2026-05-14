@@ -1173,9 +1173,8 @@ function drawReflection(hitData) {
   canvas.style.top = (feetFromHeroTop - offset) + "px";
   canvas.style.transform = `translateX(-50%) rotate(${isMobile ? 20 : 10}deg)`;
   canvas.style.transformOrigin = "50% 0%";
-  canvas.style.bottom  = "auto";
-  canvas.style.left    = "50%";
-  canvas.style.transform = "translateX(-50%)";
+  canvas.style.bottom = "auto";
+  canvas.style.left   = "50%";
 }
 
 // Simple box blur for canvas (3-pass approximation of Gaussian)
