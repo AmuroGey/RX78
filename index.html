@@ -1169,7 +1169,7 @@ function drawReflection(hitData) {
   canvas.style.height  = rendRefH + "px";
   // Top of canvas = feet of kit, reflection extends downward
   const isMobile = window.innerWidth <= 700;
-  const offset = isMobile ? 0 : 38;
+  const offset = isMobile ? 10 : 36;
   canvas.style.top = (feetFromHeroTop - offset) + "px";
   canvas.style.bottom  = "auto";
   canvas.style.left    = "50%";
