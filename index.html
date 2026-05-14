@@ -164,7 +164,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-close:hover{border-color:var(--amber);color:var(--amber);}
 
 /* TOGGLE — always pinned at bottom of modal */
-.drawer-toggle{position:absolute;bottom:0;left:0;right:0;z-index:22;height:44px;background:rgba(5,8,16,0.92);border:none;border-top:1px solid var(--border-bright);color:var(--amber);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer;width:100%;transition:background 0.2s;backdrop-filter:blur(8px);}
+.drawer-toggle{position:absolute;bottom:0;left:0;right:0;z-index:22;height:44px;background:rgba(5,8,16,0.92);border:none;border-top:1px solid var(--border-bright);color:var(--amber);font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:3px;cursor:pointer;width:100%;transition:background 0.2s;backdrop-filter:blur(8px);}
 .drawer-toggle:hover{background:rgba(10,16,28,0.98);}
 
 /* DRAWER — slides up from bottom, covers full modal when open */
@@ -195,7 +195,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .photo-viewer-shots{position:absolute;inset:0;z-index:4;pointer-events:none;}
 .photo-shot{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:40%;height:115%;pointer-events:none;cursor:pointer;}
 .photo-shot img.hovered{filter:drop-shadow(0 12px 40px rgba(0,0,0,0.95)) brightness(1.12);}
-.flip-btn{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);z-index:6;background:rgba(5,8,16,0.82);border:1px solid var(--border-bright);color:var(--amber);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;padding:6px 18px;cursor:pointer;transition:border-color 0.2s,color 0.2s;backdrop-filter:blur(6px);}
+.flip-btn{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);z-index:6;background:rgba(5,8,16,0.82);border:1px solid var(--border-bright);color:var(--amber);font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:3px;padding:6px 18px;cursor:pointer;transition:border-color 0.2s,color 0.2s;backdrop-filter:blur(6px);}
 .flip-btn:hover{border-color:var(--amber);color:#fff;}
 .photo-shot-empty{width:37%;height:70%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-size:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;border:1px dashed rgba(255,255,255,0.07);background:rgba(0,0,0,0.25);}
 .panel-corner{position:absolute;width:14px;height:14px;border-color:rgba(232,160,32,0.4);border-style:solid;z-index:4;}
@@ -1169,7 +1169,7 @@ function drawReflection(hitData) {
   canvas.style.height  = rendRefH + "px";
   // Top of canvas = feet of kit, reflection extends downward
   const isMobile = window.innerWidth <= 700;
-  const offset = isMobile ? 17 : 34;
+  const offset = isMobile ? 17 : 32;
   canvas.style.top = (feetFromHeroTop - offset) + "px";
   canvas.style.transform = "translateX(-50%) rotate(10deg)";
   canvas.style.transformOrigin = "50% 0%";
