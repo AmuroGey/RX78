@@ -1062,7 +1062,8 @@ function buildPhotoViewer(kit) {
     const { canvas, ctx } = makeCanvas(frontImg);
     hero._hitFront = { canvas, ctx, img: frontImg };
     hero._zoomUrl = frontImg.src;
-    drawReflection(hero._hitFront);
+    // Small delay so layout settles before measuring positions
+    setTimeout(() => drawReflection(hero._hitFront), 100);
   };
   backImg.onload = () => {
     const { canvas, ctx } = makeCanvas(backImg);
@@ -1132,40 +1133,46 @@ function drawReflection(hitData) {
   const src = hitData.canvas;
   const natW = src.width, natH = src.height;
 
-  // Reflection height = 30% of source image height
   const refH = Math.round(natH * 0.30);
-  const refW = natW;
-
-  canvas.width  = refW;
+  canvas.width  = natW;
   canvas.height = refH;
 
   const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, refW, refH);
+  ctx.clearRect(0, 0, natW, refH);
 
-  // Draw the bottom portion of the source image, flipped vertically
+  // Draw bottom 30% of source, flipped vertically
   ctx.save();
   ctx.translate(0, refH);
   ctx.scale(1, -1);
-  // Draw only bottom 30% of source (where the kit feet are)
-  ctx.drawImage(src, 0, natH - refH, refW, refH, 0, 0, refW, refH);
+  ctx.drawImage(src, 0, natH - refH, natW, refH, 0, 0, natW, refH);
   ctx.restore();
 
-  // Blur via stack blur approximation — repeated box blur passes
-  stackBlurCanvas(canvas, 0, 0, refW, refH, 18);
+  stackBlurCanvas(canvas, 0, 0, natW, refH, 18);
 
-  // Size the canvas element to match rendered image width
+  // Compute rendered image bounds within the .photo-shot element
   const img = hitData.img;
-  const rect = img.getBoundingClientRect();
-  const heroRect = document.getElementById("panel-hero").getBoundingClientRect();
-  const scaleX = rect.width / natW;
-  const scaleY = rect.height / natH;
+  const heroEl = document.getElementById("panel-hero");
+  const heroRect = heroEl.getBoundingClientRect();
+  const imgRect  = img.getBoundingClientRect();
+
+  const scaleX = imgRect.width  / natW;
+  const scaleY = imgRect.height / natH;
   const scale  = Math.min(scaleX, scaleY);
   const rendW  = natW * scale;
   const rendH  = natH * scale;
   const rendRefH = refH * scale;
 
-  canvas.style.width  = rendW + "px";
-  canvas.style.height = rendRefH + "px";
+  // Feet land at bottom of rendered image (object-position:center bottom)
+  // imgRect.bottom is feet position in viewport coords
+  // Convert to offset from hero element bottom
+  const feetFromHeroBottom = heroRect.bottom - imgRect.bottom;
+
+  canvas.style.width   = rendW + "px";
+  canvas.style.height  = rendRefH + "px";
+  // Position: bottom edge of canvas = feet of kit
+  canvas.style.bottom  = feetFromHeroBottom + "px";
+  canvas.style.left    = "50%";
+  canvas.style.transform = "translateX(-50%)";
 }
 
 // Simple box blur for canvas (3-pass approximation of Gaussian)
