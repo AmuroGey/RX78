@@ -1066,8 +1066,10 @@ function buildPhotoViewer(kit) {
     setTimeout(() => drawReflection(hero._hitFront), 100);
   };
   backImg.onload = () => {
-    const { canvas, ctx } = makeCanvas(backImg);
-    hero._hitBack = { canvas, ctx, img: backImg };
+    setTimeout(() => {
+      const { canvas, ctx } = makeCanvas(backImg);
+      hero._hitBack = { canvas, ctx, img: backImg };
+    }, 0);
   };
   frontImg.crossOrigin = "anonymous";
   backImg.crossOrigin  = "anonymous";
@@ -1085,7 +1087,8 @@ function buildPhotoViewer(kit) {
     newBtn.textContent = showingFront ? "[ FRONT ]" : "[ BACK ]";
     const active = showingFront ? hero._hitFront : hero._hitBack;
     hero._zoomUrl = active ? active.img.src : null;
-    drawReflection(active);
+    // Defer heavy canvas work so the fade transition runs uninterrupted
+    setTimeout(() => drawReflection(active), 50);
   });
 
   // Detail panel
@@ -1133,23 +1136,26 @@ function drawReflection(hitData) {
   const src = hitData.canvas;
   const natW = src.width, natH = src.height;
 
-  const refH = Math.round(natH * 0.30);
-  canvas.width  = natW;
+  // Work at half resolution — 4x fewer pixels to blur
+  const ds = 0.5;
+  const srcRefH = Math.round(natH * 0.30);
+  const refW = Math.round(natW * ds);
+  const refH = Math.round(srcRefH * ds);
+
+  canvas.width  = refW;
   canvas.height = refH;
 
   const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, natW, refH);
+  ctx.clearRect(0, 0, refW, refH);
 
-  // Draw bottom 30% of source, flipped vertically
   ctx.save();
   ctx.translate(0, refH);
   ctx.scale(1, -1);
-  ctx.drawImage(src, 0, natH - refH, natW, refH, 0, 0, natW, refH);
+  ctx.drawImage(src, 0, natH - srcRefH, natW, srcRefH, 0, 0, refW, refH);
   ctx.restore();
 
-  stackBlurCanvas(canvas, 0, 0, natW, refH, 18);
+  stackBlurCanvas(canvas, 0, 0, refW, refH, 10);
 
-  // Compute rendered image bounds within the .photo-shot element
   const img = hitData.img;
   const heroEl = document.getElementById("panel-hero");
   const heroRect = heroEl.getBoundingClientRect();
@@ -1157,20 +1163,17 @@ function drawReflection(hitData) {
 
   const scaleX = imgRect.width  / natW;
   const scaleY = imgRect.height / natH;
-  const scale  = Math.min(scaleX, scaleY);
-  const rendW  = natW * scale;
-  const rendH  = natH * scale;
-  const rendRefH = refH * scale;
+  const rendScale = Math.min(scaleX, scaleY);
+  const rendW    = natW * rendScale;
+  const rendRefH = srcRefH * rendScale;
 
-  // Feet land at imgRect.bottom. Convert to offset from hero element top.
   const feetFromHeroTop = imgRect.bottom - heroRect.top;
+  const isMobile = window.innerWidth <= 700;
+  const offset = isMobile ? 17 : 32;
 
   canvas.style.width   = rendW + "px";
   canvas.style.height  = rendRefH + "px";
-  // Top of canvas = feet of kit, reflection extends downward
-  const isMobile = window.innerWidth <= 700;
-  const offset = isMobile ? 17 : 32;
-  canvas.style.top = (feetFromHeroTop - offset) + "px";
+  canvas.style.top     = (feetFromHeroTop - offset) + "px";
   canvas.style.transform = "translateX(-50%) rotate(10deg)";
   canvas.style.transformOrigin = "50% 0%";
   canvas.style.bottom = "auto";
