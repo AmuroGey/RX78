@@ -138,6 +138,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .kit-cell{padding:12px 16px;display:flex;align-items:center;border-right:1px solid rgba(30,58,95,0.3);font-size:11px;}
 .kit-cell:last-child{border-right:none;}
 .kit-mold{font-family:'Orbitron',monospace;font-size:13px;color:var(--text-bright);letter-spacing:1px;}
+.kit-variant{font-family:'Share Tech',sans-serif;font-size:11px;color:var(--text);}
 .kit-year{color:var(--text-dim);letter-spacing:1px;font-size:13px;}
 .status-pip{font-size:9px;letter-spacing:1px;padding:2px 8px;border:1px solid;text-transform:uppercase;}
 .status-mobile{display:none;}
@@ -349,7 +350,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .kit-list{padding:0 64px 8px;}
   .kit-row{grid-template-columns:220px 1fr 120px 170px;}
   .kit-cell{padding:14px 24px;font-size:13px;}
-  .kit-mold{font-size:14px;}
+  .kit-mold{font-size:18px !important;font-weight:900;}
+  .kit-variant{font-size:15px !important;font-weight:700;color:var(--text-bright);}
   .kit-year{font-size:13px;}
   .status-pip{font-size:11px;padding:3px 10px;letter-spacing:1px;}
   .rx-tag{font-size:11px;padding:3px 8px;}
@@ -957,7 +959,7 @@ function renderRegistry() {
           <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
             <span class="kit-mold">${kit.mold}</span>
             <span style="font-size:11px;color:var(--text-dim)">—</span>
-            <span style="font-family:'Share Tech',sans-serif;font-size:11px;color:var(--text)">${kit.variant}</span>
+            <span class="kit-variant">${kit.variant}</span>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;">
             <span class="status-pip status-mobile" style="color:${sc};border-color:${sc};background:${sc}12">${STATUS_LABEL[kit.status]}</span>
