@@ -1030,7 +1030,7 @@ function openModal(kit) {
 
   // Reset loading overlay BEFORE building the viewer so it shows immediately
   const loadingEl = document.getElementById("photo-viewer-loading");
-  if (loadingEl) loadingEl.classList.remove("done");
+  if (loadingEl) { loadingEl.classList.remove("done"); loadingEl.textContent = "[ LOADING DATA ]"; }
 
   buildPhotoViewer(kit);
 
@@ -1044,6 +1044,7 @@ function openModal(kit) {
 
 function buildPhotoViewer(kit) {
   const base = `photos/${kit.grade}/${kit.id}`;
+  const loadingEl = document.getElementById("photo-viewer-loading");
 
   const frontImg = document.getElementById("hero-front");
   const backImg  = document.getElementById("hero-back");
@@ -1054,11 +1055,28 @@ function buildPhotoViewer(kit) {
   frontImg.src = ""; frontImg.style.opacity = "0";
   backImg.src  = ""; backImg.style.opacity  = "0";
   hero._hitFront = null; hero._hitBack = null;
-  // Clear reflection from any previous kit
   const reflCanvas = document.getElementById("hero-reflection");
   if (reflCanvas) { reflCanvas.width = 0; reflCanvas.style.opacity = "0"; }
   let showingFront = true;
 
+  // Check if any image data exists at all — probe front.png
+  const probe = new Image();
+  probe.onload = () => buildPhotoViewerWithData(kit, base, loadingEl, frontImg, backImg, flipBtn, hero, showingFront);
+  probe.onerror = () => {
+    // No front image — check detail shots too before declaring no data
+    const detail = new Image();
+    detail.onload = () => buildPhotoViewerWithData(kit, base, loadingEl, frontImg, backImg, flipBtn, hero, showingFront);
+    detail.onerror = () => {
+      // Truly no data
+      if (loadingEl) { loadingEl.textContent = "[ NO DATA ]"; }
+      if (loadingTimer) clearTimeout(loadingTimer);
+    };
+    detail.src = `${base}/01.png`;
+  };
+  probe.src = `${base}/front.png`;
+}
+
+function buildPhotoViewerWithData(kit, base, loadingEl, frontImg, backImg, flipBtn, hero, showingFront) {
   function makeCanvas(img) {
     const c = document.createElement("canvas");
     c.width = img.naturalWidth; c.height = img.naturalHeight;
