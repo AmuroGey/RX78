@@ -1054,6 +1054,9 @@ function buildPhotoViewer(kit) {
   frontImg.src = ""; frontImg.style.opacity = "0";
   backImg.src  = ""; backImg.style.opacity  = "0";
   hero._hitFront = null; hero._hitBack = null;
+  // Clear reflection from any previous kit
+  const reflCanvas = document.getElementById("hero-reflection");
+  if (reflCanvas) { reflCanvas.width = 0; reflCanvas.style.opacity = "0"; }
   let showingFront = true;
 
   function makeCanvas(img) {
@@ -1180,6 +1183,7 @@ function drawReflection(hitData) {
 
   canvas.style.width   = rendW + "px";
   canvas.style.height  = rendRefH + "px";
+  canvas.style.opacity = "0.45";
   canvas.style.top     = (feetFromHeroTop - offset) + "px";
   canvas.style.transform = "translateX(-50%) rotate(10deg)";
   canvas.style.transformOrigin = "50% 0%";
