@@ -577,7 +577,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     </div>
 
     <!-- Toggle button always at bottom -->
-    <button class="drawer-toggle" id="drawer-toggle" aria-label="Toggle info">^ [DETAILS] ^</button>
+    <button class="drawer-toggle" id="drawer-toggle" aria-label="Toggle info">↑ [DETAILS] ↑</button>
 
     <!-- Info drawer slides up from below toggle -->
     <div class="modal-drawer" id="modal-drawer">
@@ -1039,7 +1039,7 @@ function openModal(kit) {
   history.replaceState(null, "", "#" + kit.id);
   // Reset drawer to closed state
   document.getElementById("modal-drawer").classList.remove("open");
-  document.getElementById("drawer-toggle").textContent = "^ [DETAILS] ^";
+  document.getElementById("drawer-toggle").textContent = "↑ [DETAILS] ↑";
 }
 
 function buildPhotoViewer(kit) {
@@ -1530,7 +1530,7 @@ document.getElementById("drawer-toggle").addEventListener("click", () => {
   const drawer = document.getElementById("modal-drawer");
   const btn = document.getElementById("drawer-toggle");
   const open = drawer.classList.toggle("open");
-  btn.textContent = open ? "v [DETAILS] v" : "^ [DETAILS] ^";
+  btn.textContent = open ? "↓ [DETAILS] ↓" : "↑ [DETAILS] ↑";
 });
 
 // ── QR CODE GRID ─────────────────────────────────────────────────────────────
