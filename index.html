@@ -184,6 +184,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .modal-body{display:grid;grid-template-columns:1fr 1fr;}
 .modal-left{padding:36px;border-right:1px solid var(--border);background:var(--panel);}
 .modal-right{padding:36px;}
+.modal-boxart{display:flex;flex-direction:column;flex:1;min-height:0;}
+.modal-boxart-img-wrap{flex:1;min-height:0;overflow:hidden;margin-top:8px;}
 .modal-sec{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
 .modal-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(30,58,95,0.35);font-size:15px;}
 .modal-key{color:var(--text-dim);letter-spacing:1px;}
@@ -376,6 +378,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .drawer-content{display:flex;flex-direction:column;}
   .modal-body{flex:1;min-height:0;}
   .modal-left{display:flex;flex-direction:column;overflow-y:auto;}
+  .modal-right{display:flex;flex-direction:column;}
   .modal-left .modal-sec{font-size:36px;letter-spacing:4px;flex-shrink:0;}
   .modal-left .modal-row{font-size:42px;padding:22px 0;}
   .modal-left .modal-key{font-size:38px;}
@@ -592,6 +595,13 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
             <div id="modal-tags"></div>
             <div class="modal-sec" style="margin-top:20px;">Kit ID</div>
             <div id="modal-id" style="font-size:11px;color:var(--text-dim);letter-spacing:1px;"></div>
+            <div class="modal-boxart" id="modal-boxart-wrap">
+              <div class="modal-sec" style="margin-top:20px;">Box Art</div>
+              <div class="modal-boxart-img-wrap" id="modal-boxart-img-wrap">
+                <img id="modal-boxart-img" style="display:none;width:100%;height:100%;object-fit:contain;object-position:center top;">
+                <div id="modal-boxart-none" style="font-size:10px;letter-spacing:2px;color:var(--text-dim);display:none;">NO IMAGE</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-notes" id="modal-notes-wrap">
@@ -1027,6 +1037,16 @@ function openModal(kit) {
   const notesText = document.getElementById("modal-notes-text");
   if (kit.notes) { notesWrap.style.display = ""; notesText.textContent = kit.notes; }
   else { notesWrap.style.display = "none"; }
+
+  // Boxart
+  const boxartImg  = document.getElementById("modal-boxart-img");
+  const boxartNone = document.getElementById("modal-boxart-none");
+  boxartImg.style.display = "none";
+  boxartNone.style.display = "none";
+  const ba = new Image();
+  ba.onload = () => { boxartImg.src = ba.src; boxartImg.style.display = "block"; };
+  ba.onerror = () => { boxartNone.style.display = "block"; };
+  ba.src = `photos/${kit.grade}/${kit.id}/boxart.png`;
 
   // Reset loading overlay BEFORE building the viewer so it shows immediately
   const loadingEl = document.getElementById("photo-viewer-loading");
