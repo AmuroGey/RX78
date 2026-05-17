@@ -92,10 +92,10 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .page.visible{opacity:1;pointer-events:all;}
 
 /* TOOLBAR */
-.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
+.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.88);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
 .toolbar-spacer{height:57px;}
 .drop-wrap{position:relative;overflow:visible;}
-.drop-btn{padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:rgba(0,0,0,0.6);border:1px solid var(--border);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;backdrop-filter:blur(6px);}
+.drop-btn{padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
 .drop-btn:hover,.drop-btn.open{border-color:var(--amber);color:var(--amber);background:var(--amber-glow);}
 .drop-btn.has-value{border-color:var(--cyan-dim);color:var(--cyan);}
 .drop-chevron{font-size:8px;opacity:0.7;transition:transform 0.2s;display:inline-block;}
@@ -107,18 +107,12 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .drop-item:hover{color:var(--text-bright);background:rgba(255,255,255,0.04);}
 .drop-item.selected{color:var(--amber);background:var(--amber-glow);}
 .drop-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.rx-search{margin-left:auto;background:rgba(0,0,0,0.6);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 14px;width:220px;outline:none;letter-spacing:1px;backdrop-filter:blur(6px);}
+.rx-search{margin-left:auto;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 14px;width:220px;outline:none;letter-spacing:1px;}
 .rx-search:focus{border-color:var(--amber);}
 .rx-search::placeholder{color:var(--text-dim);}
 
-/* Fade page content out toward the fixed bars so it doesn't visibly overlap */
-#page-collection{-webkit-mask-image:linear-gradient(to bottom,transparent 100px,black 160px);mask-image:linear-gradient(to bottom,transparent 100px,black 160px);}
-#page-timeline{-webkit-mask-image:linear-gradient(to bottom,transparent 80px,black 140px);mask-image:linear-gradient(to bottom,transparent 80px,black 140px);}
 .section-header{display:flex;align-items:center;gap:16px;padding:12px 32px;}
-#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
-#page-timeline .section-header .section-line{display:none;}
-#page-timeline .section-header .section-label,
-#page-timeline .section-header .section-count{text-shadow:0 0 12px rgba(0,0,0,0.9),0 1px 4px rgba(0,0,0,1);}
+#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.88);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
 .tl-header-spacer{height:49px;}
 .section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;white-space:nowrap;}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);}
