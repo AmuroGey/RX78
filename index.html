@@ -391,6 +391,72 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .panel-spec-val{font-size:13px;}
 }
 
+/* ── TIMELINE PAGE ─────────────────────────────────────────────────────── */
+#page-timeline{padding-top:56px;}
+.timeline-wrap{padding:40px 0 80px;position:relative;}
+
+/* centre spine */
+.timeline-spine{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 0%,var(--border-bright) 4%,var(--border-bright) 96%,transparent 100%);transform:translateX(-50%);pointer-events:none;}
+.timeline-spine-glow{position:absolute;left:50%;top:0;bottom:0;width:3px;transform:translateX(-50%);background:linear-gradient(to bottom,transparent,rgba(74,191,223,0.06),transparent);pointer-events:none;}
+
+/* each year block */
+.tl-year-block{position:relative;margin-bottom:0;}
+
+/* the node on the spine */
+.tl-node-row{display:flex;align-items:center;justify-content:center;position:relative;height:64px;cursor:pointer;z-index:2;}
+.tl-node{width:14px;height:14px;border:2px solid var(--border-bright);background:#050810;transform:rotate(45deg);transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;flex-shrink:0;position:relative;z-index:3;}
+.tl-node-row:hover .tl-node,
+.tl-node-row.open .tl-node{border-color:var(--amber);background:var(--amber);box-shadow:0 0 16px rgba(232,160,32,0.5);}
+
+/* year label — alternates left/right via JS */
+.tl-year-label{position:absolute;font-family:'Orbitron',monospace;font-weight:900;font-size:22px;letter-spacing:4px;color:var(--text-dim);transition:color 0.2s,text-shadow 0.2s;white-space:nowrap;user-select:none;}
+.tl-node-row:hover .tl-year-label,
+.tl-node-row.open .tl-year-label{color:var(--amber);text-shadow:0 0 20px rgba(232,160,32,0.4);}
+.tl-year-label.left{right:calc(50% + 28px);text-align:right;}
+.tl-year-label.right{left:calc(50% + 28px);text-align:left;}
+
+/* kit count badge next to label */
+.tl-year-count{position:absolute;font-size:9px;letter-spacing:2px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;white-space:nowrap;}
+.tl-year-count.left{right:calc(50% + 28px);text-align:right;}
+.tl-year-count.right{left:calc(50% + 28px);text-align:left;}
+
+/* connector line from node to kit list */
+.tl-connector{position:absolute;left:50%;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);transform-origin:left;pointer-events:none;z-index:1;}
+.tl-connector.left{transform:scaleX(-1);right:50%;left:auto;}
+
+/* kit list panel */
+.tl-kit-panel{overflow:hidden;max-height:0;transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);position:relative;}
+.tl-kit-panel.open{max-height:800px;}
+.tl-kit-inner{padding:0 0 24px;}
+
+/* kit rows inside timeline — same style as collection, left or right aligned */
+.tl-kit-list{width:44%;margin-bottom:0;}
+.tl-kit-list.left{margin-left:6%;}
+.tl-kit-list.right{margin-left:50%;}
+.tl-kit-row{display:grid;grid-template-columns:auto 1fr auto;gap:0;border:1px solid var(--border);border-top:none;background:rgba(0,0,0,0.55);cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.tl-kit-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border-bright);transition:background 0.15s;}
+.tl-kit-row:hover{background:rgba(15,25,40,0.9);border-color:#a06010;}
+.tl-kit-row:hover::before{background:var(--amber);}
+.tl-kit-row:first-child{border-top:1px solid var(--border);}
+.tl-kit-cell{padding:10px 14px;display:flex;align-items:center;border-right:1px solid rgba(30,58,95,0.3);font-size:11px;}
+.tl-kit-cell:last-child{border-right:none;}
+.tl-kit-mold{font-family:'Orbitron',monospace;font-size:12px;color:var(--text-bright);letter-spacing:1px;}
+.tl-kit-variant{font-family:'Share Tech',sans-serif;font-size:11px;color:var(--text);margin-top:2px;}
+
+/* scan-in animation for the spine drawing down on page load */
+@keyframes spineGrow{from{transform:translateX(-50%) scaleY(0);transform-origin:top;}to{transform:translateX(-50%) scaleY(1);transform-origin:top;}}
+.timeline-spine{animation:spineGrow 1.2s cubic-bezier(0.4,0,0.2,1) forwards;}
+
+/* Desktop */
+@media(min-width:1101px){
+  .tl-year-label{font-size:30px;}
+  .tl-kit-list{width:42%;}
+  .tl-kit-list.left{margin-left:8%;}
+  .tl-kit-list.right{margin-left:50%;}
+  .tl-kit-mold{font-size:14px;}
+  .tl-kit-variant{font-size:12px;}
+}
+
 /* MOBILE */
 @media(max-width:700px){
   #boot-lines{gap:5px;}
@@ -430,6 +496,18 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .modal-notes,.modal-left,.modal-right{padding:16px;}
   .landing-title{font-size:clamp(36px,10vw,56px);}
   #access-btn{padding:12px 32px;font-size:10px;letter-spacing:3px;}
+
+  /* Timeline mobile: spine on left edge, everything to the right */
+  .timeline-spine,.timeline-spine-glow{left:28px;}
+  .tl-node-row{justify-content:flex-start;padding-left:18px;}
+  .tl-year-label{font-size:15px;letter-spacing:2px;}
+  .tl-year-label.left,.tl-year-label.right{left:54px;right:auto;text-align:left;}
+  .tl-year-count.left,.tl-year-count.right{left:54px;right:auto;text-align:left;}
+  .tl-year-count{top:38px;}
+  .tl-connector{display:none;}
+  .tl-kit-list.left,.tl-kit-list.right{width:calc(100% - 60px);margin-left:54px;}
+  .tl-kit-cell{padding:8px 10px;}
+  .tl-kit-mold{font-size:11px;}
 }
 </style>
 </head>
@@ -467,6 +545,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   </div>
   <ul class="nav-links">
     <li><button class="active" data-page="collection">Collection</button></li>
+    <li><button data-page="timeline">Timeline</button></li>
     <li><button data-page="about">About</button></li>
   </ul>
   <div class="nav-status">
@@ -507,6 +586,24 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   <div class="rx-footer">
     <span>RX-78 ARCHIVE // COLLECTION DATABASE</span>
     <span id="footer-count"></span>
+  </div>
+</div>
+
+<!-- TIMELINE PAGE -->
+<div class="page" id="page-timeline">
+  <div class="section-header">
+    <span class="section-label">Production Timeline</span>
+    <div class="section-line"></div>
+    <span class="section-count" id="tl-count"></span>
+  </div>
+  <div class="timeline-wrap" id="timeline-wrap">
+    <div class="timeline-spine"></div>
+    <div class="timeline-spine-glow"></div>
+    <div id="timeline-nodes"></div>
+  </div>
+  <div class="rx-footer">
+    <span>RX-78 ARCHIVE // PRODUCTION TIMELINE</span>
+    <span id="tl-footer-count"></span>
   </div>
 </div>
 
@@ -830,6 +927,7 @@ document.querySelectorAll(".nav-links button").forEach(btn => {
     page.classList.add("active");
     setTimeout(() => page.classList.add("visible"), 50);
     if (btn.dataset.page === "about") buildQrGrid();
+    if (btn.dataset.page === "timeline") buildTimeline();
   });
 });
 
@@ -1575,7 +1673,103 @@ document.getElementById("drawer-toggle").addEventListener("click", () => {
   btn.textContent = open ? "↓ [DETAILS] ↓" : "↑ [DETAILS] ↑";
 });
 
-// ── QR CODE GRID ─────────────────────────────────────────────────────────────
+// ── TIMELINE ─────────────────────────────────────────────────────────────────
+let timelineBuilt = false;
+let tlCollapsed = {};
+
+function buildTimeline() {
+  // Update count label every time (kits may have loaded after first call)
+  const years = [...new Set(kits.map(k => k.year))].sort((a, b) => a - b);
+  document.getElementById("tl-count").textContent = years.length + " YEARS · " + kits.length + " KITS";
+  document.getElementById("tl-footer-count").textContent = kits.length + " TOTAL ENTRIES · DATA SOURCED FROM kits.json";
+
+  if (timelineBuilt) return;
+  timelineBuilt = true;
+
+  const container = document.getElementById("timeline-nodes");
+  container.innerHTML = "";
+
+  years.forEach((year, idx) => {
+    const yearKits = kits.filter(k => k.year === year);
+    const side = idx % 2 === 0 ? "left" : "right"; // alternate sides
+
+    // Initialize collapsed state (all collapsed by default)
+    if (tlCollapsed[year] === undefined) tlCollapsed[year] = true;
+
+    const block = document.createElement("div");
+    block.className = "tl-year-block";
+
+    // --- Node row ---
+    const nodeRow = document.createElement("div");
+    nodeRow.className = "tl-node-row";
+
+    const node = document.createElement("div");
+    node.className = "tl-node";
+
+    const yearLabel = document.createElement("div");
+    yearLabel.className = "tl-year-label " + side;
+    yearLabel.textContent = year;
+
+    const countLabel = document.createElement("div");
+    countLabel.className = "tl-year-count " + side;
+    countLabel.textContent = yearKits.length + " KIT" + (yearKits.length !== 1 ? "S" : "");
+
+    nodeRow.appendChild(node);
+    nodeRow.appendChild(yearLabel);
+    nodeRow.appendChild(countLabel);
+
+    // --- Kit panel ---
+    const panel = document.createElement("div");
+    panel.className = "tl-kit-panel" + (tlCollapsed[year] ? "" : " open");
+
+    const inner = document.createElement("div");
+    inner.className = "tl-kit-inner";
+
+    const list = document.createElement("div");
+    list.className = "tl-kit-list " + side;
+
+    yearKits.forEach(kit => {
+      const c = GRADE_COLOR[kit.grade] || "#888";
+      const sc = STATUS_COLOR[kit.status];
+      const row = document.createElement("div");
+      row.className = "tl-kit-row";
+      row.innerHTML = `
+        <div class="tl-kit-cell">
+          <span class="grade-badge" style="color:${c};border-color:${c};background:${c}10;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;letter-spacing:2px;padding:2px 8px;border:1px solid;">${GRADE_BADGE[kit.grade] || kit.grade}</span>
+        </div>
+        <div class="tl-kit-cell" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <div class="tl-kit-mold">${kit.mold}</div>
+          <div class="tl-kit-variant">${kit.variant}</div>
+        </div>
+        <div class="tl-kit-cell">
+          <span class="status-pip" style="color:${sc};border-color:${sc};background:${sc}12;font-size:9px;letter-spacing:1px;padding:2px 7px;border:1px solid;text-transform:uppercase;">${STATUS_LABEL[kit.status]}</span>
+        </div>
+      `;
+      row.addEventListener("click", () => openModal(kit));
+      list.appendChild(row);
+    });
+
+    inner.appendChild(list);
+    panel.appendChild(inner);
+
+    // Toggle on node click
+    nodeRow.addEventListener("click", () => {
+      tlCollapsed[year] = !tlCollapsed[year];
+      const open = !tlCollapsed[year];
+      panel.classList.toggle("open", open);
+      nodeRow.classList.toggle("open", open);
+    });
+
+    // Open state restore
+    if (!tlCollapsed[year]) nodeRow.classList.add("open");
+
+    block.appendChild(nodeRow);
+    block.appendChild(panel);
+    container.appendChild(block);
+  });
+}
+
+
 let qrBuilt = false;
 function buildQrGrid() {
   if (qrBuilt || !kits.length) return;
