@@ -92,10 +92,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .page.visible{opacity:1;pointer-events:all;}
 
 /* TOOLBAR */
-.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
-.toolbar-spacer{height:0;}
-/* scroll-content overlaps behind the bar zone, mask fades it out over exactly that height */
-.scroll-content{padding-top:60px;-webkit-mask-image:linear-gradient(to bottom,transparent 0px,transparent 20px,black 60px);mask-image:linear-gradient(to bottom,transparent 0px,transparent 20px,black 60px);}
+.toolbar{padding:20px 32px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;}
 .drop-wrap{position:relative;overflow:visible;}
 .drop-btn{padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
 .drop-btn:hover,.drop-btn.open{border-color:var(--amber);color:var(--amber);background:var(--amber-glow);}
@@ -113,9 +110,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .rx-search:focus{border-color:var(--amber);}
 .rx-search::placeholder{color:var(--text-dim);}
 
-.section-header{display:flex;align-items:center;gap:16px;padding:12px 32px;}
-#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
-.tl-header-spacer{height:0;}
+.section-header{display:flex;align-items:center;gap:16px;padding:20px 32px 16px;}
 .section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;white-space:nowrap;}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);}
 .section-count{font-size:10px;color:var(--text-dim);letter-spacing:1px;white-space:nowrap;}
@@ -344,12 +339,11 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 @media(min-width:1101px){
   html{font-size:14px;}
   body{font-size:14px;}
-  .toolbar{padding:12px 64px;gap:14px;}
-  .toolbar-spacer{height:57px;}
+  .toolbar{padding:28px 64px 0;gap:14px;}
   .drop-btn{font-size:12px;padding:10px 22px;letter-spacing:2px;}
   .drop-item{font-size:12px;padding:11px 22px;letter-spacing:1px;}
   .rx-search{font-size:12px;padding:8px 18px;width:260px;}
-  .section-header{padding:12px 64px;}
+  .section-header{padding:28px 64px 20px;}
   .section-label{font-size:12px;letter-spacing:5px;}
   .section-count{font-size:12px;}
   .list-header{grid-template-columns:220px 1fr 120px 170px;padding:0 64px;}
@@ -472,12 +466,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .nav-links li button{padding:0 10px;height:48px;line-height:48px;font-size:9px;letter-spacing:1px;}
   .nav-status{display:none;}
   .page{padding-top:48px;}
-  .toolbar{padding:8px 12px;gap:8px;top:48px;background:transparent;border-bottom:none;}
-  .toolbar-spacer{height:0;}
-  .rx-search{width:100%;margin-left:0;font-size:11px;}
-  .section-header{padding:8px 12px;gap:8px;}
-  #page-timeline .section-header{top:48px;background:transparent;border-bottom:none;}
-  .tl-header-spacer{height:0;}
+  .toolbar{padding:10px 12px 0;gap:8px;}
+  .rx-search{width:100%;margin-left:0;font-size:11px;margin-top:4px;}
+  .section-header{padding:12px 12px 10px;gap:8px;}
   .section-label{font-size:9px;letter-spacing:2px;}
   .section-count{font-size:9px;}
   .list-header{display:none;}
@@ -580,8 +571,6 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <input class="rx-search" id="search-input" placeholder="SEARCH MOLD / VARIANT / TAG..." />
     <button class="drop-btn" id="expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
-  <div class="toolbar-spacer"></div>
-  <div class="scroll-content">
   <div class="section-header">
     <span class="section-label">Kit Registry</span>
     <div class="section-line"></div>
@@ -598,7 +587,6 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <span>RX-78 ARCHIVE // COLLECTION DATABASE</span>
     <span id="footer-count"></span>
   </div>
-  </div>
 </div>
 
 <!-- TIMELINE PAGE -->
@@ -609,8 +597,6 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <span class="section-count" id="tl-count"></span>
     <button class="drop-btn" id="tl-expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
-  <div class="tl-header-spacer"></div>
-  <div class="scroll-content">
   <div class="timeline-wrap" id="timeline-wrap">
     <div class="timeline-spine"></div>
     <div class="timeline-spine-glow"></div>
@@ -619,7 +605,6 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   <div class="rx-footer">
     <span>RX-78 ARCHIVE // PRODUCTION TIMELINE</span>
     <span id="tl-footer-count"></span>
-  </div>
   </div>
 </div>
 
