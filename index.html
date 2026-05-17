@@ -92,8 +92,10 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .page.visible{opacity:1;pointer-events:all;}
 
 /* TOOLBAR */
-.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.88);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
+.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
 .toolbar-spacer{height:57px;}
+/* Scrollable content fades out at the top so it doesn't show through the transparent bar */
+.scroll-content{-webkit-mask-image:linear-gradient(to bottom,transparent 0px,black 48px);mask-image:linear-gradient(to bottom,transparent 0px,black 48px);}
 .drop-wrap{position:relative;overflow:visible;}
 .drop-btn{padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
 .drop-btn:hover,.drop-btn.open{border-color:var(--amber);color:var(--amber);background:var(--amber-glow);}
@@ -112,7 +114,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .rx-search::placeholder{color:var(--text-dim);}
 
 .section-header{display:flex;align-items:center;gap:16px;padding:12px 32px;}
-#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.88);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
+#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:transparent;border-bottom:none;}
 .tl-header-spacer{height:49px;}
 .section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;white-space:nowrap;}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);}
@@ -470,11 +472,11 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .nav-links li button{padding:0 10px;height:48px;line-height:48px;font-size:9px;letter-spacing:1px;}
   .nav-status{display:none;}
   .page{padding-top:48px;}
-  .toolbar{padding:8px 12px;gap:8px;top:48px;}
+  .toolbar{padding:8px 12px;gap:8px;top:48px;background:transparent;border-bottom:none;}
   .toolbar-spacer{height:49px;}
   .rx-search{width:100%;margin-left:0;font-size:11px;}
   .section-header{padding:8px 12px;gap:8px;}
-  #page-timeline .section-header{top:48px;}
+  #page-timeline .section-header{top:48px;background:transparent;border-bottom:none;}
   .tl-header-spacer{height:45px;}
   .section-label{font-size:9px;letter-spacing:2px;}
   .section-count{font-size:9px;}
@@ -579,6 +581,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <button class="drop-btn" id="expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
   <div class="toolbar-spacer"></div>
+  <div class="scroll-content">
   <div class="section-header">
     <span class="section-label">Kit Registry</span>
     <div class="section-line"></div>
@@ -595,6 +598,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <span>RX-78 ARCHIVE // COLLECTION DATABASE</span>
     <span id="footer-count"></span>
   </div>
+  </div>
 </div>
 
 <!-- TIMELINE PAGE -->
@@ -606,6 +610,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <button class="drop-btn" id="tl-expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
   <div class="tl-header-spacer"></div>
+  <div class="scroll-content">
   <div class="timeline-wrap" id="timeline-wrap">
     <div class="timeline-spine"></div>
     <div class="timeline-spine-glow"></div>
@@ -614,6 +619,7 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   <div class="rx-footer">
     <span>RX-78 ARCHIVE // PRODUCTION TIMELINE</span>
     <span id="tl-footer-count"></span>
+  </div>
   </div>
 </div>
 
