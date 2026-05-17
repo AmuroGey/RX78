@@ -92,7 +92,8 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .page.visible{opacity:1;pointer-events:all;}
 
 /* TOOLBAR */
-.toolbar{padding:20px 32px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;}
+.toolbar{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;overflow:visible;position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
+.toolbar-spacer{height:57px;}
 .drop-wrap{position:relative;overflow:visible;}
 .drop-btn{padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
 .drop-btn:hover,.drop-btn.open{border-color:var(--amber);color:var(--amber);background:var(--amber-glow);}
@@ -111,7 +112,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 .rx-search::placeholder{color:var(--text-dim);}
 
 /* SECTION HEADER */
-.section-header{display:flex;align-items:center;gap:16px;padding:20px 32px 16px;}
+.section-header{display:flex;align-items:center;gap:16px;padding:12px 32px;}
+#page-timeline .section-header{position:fixed;top:56px;left:0;right:0;z-index:90;background:rgba(0,0,0,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);}
+.tl-header-spacer{height:49px;}
 .section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;white-space:nowrap;}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);}
 .section-count{font-size:10px;color:var(--text-dim);letter-spacing:1px;white-space:nowrap;}
@@ -340,11 +343,12 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
 @media(min-width:1101px){
   html{font-size:14px;}
   body{font-size:14px;}
-  .toolbar{padding:28px 64px 0;gap:14px;}
+  .toolbar{padding:12px 64px;gap:14px;}
+  .toolbar-spacer{height:57px;}
   .drop-btn{font-size:12px;padding:10px 22px;letter-spacing:2px;}
   .drop-item{font-size:12px;padding:11px 22px;letter-spacing:1px;}
   .rx-search{font-size:12px;padding:8px 18px;width:260px;}
-  .section-header{padding:28px 64px 20px;}
+  .section-header{padding:12px 64px;}
   .section-label{font-size:12px;letter-spacing:5px;}
   .section-count{font-size:12px;}
   .list-header{grid-template-columns:220px 1fr 120px 170px;padding:0 64px;}
@@ -467,9 +471,12 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
   .nav-links li button{padding:0 10px;height:48px;line-height:48px;font-size:9px;letter-spacing:1px;}
   .nav-status{display:none;}
   .page{padding-top:48px;}
-  .toolbar{padding:10px 12px 0;gap:8px;}
-  .rx-search{width:100%;margin-left:0;font-size:11px;margin-top:4px;}
-  .section-header{padding:12px 12px 10px;gap:8px;}
+  .toolbar{padding:8px 12px;gap:8px;top:48px;}
+  .toolbar-spacer{height:49px;}
+  .rx-search{width:100%;margin-left:0;font-size:11px;}
+  .section-header{padding:8px 12px;gap:8px;}
+  #page-timeline .section-header{top:48px;}
+  .tl-header-spacer{height:45px;}
   .section-label{font-size:9px;letter-spacing:2px;}
   .section-count{font-size:9px;}
   .list-header{display:none;}
@@ -570,7 +577,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
       <div class="drop-menu" id="status-menu"></div>
     </div>
     <input class="rx-search" id="search-input" placeholder="SEARCH MOLD / VARIANT / TAG..." />
+    <button class="drop-btn" id="expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
+  <div class="toolbar-spacer"></div>
   <div class="section-header">
     <span class="section-label">Kit Registry</span>
     <div class="section-line"></div>
@@ -595,7 +604,9 @@ body{background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;f
     <span class="section-label">Production Timeline</span>
     <div class="section-line"></div>
     <span class="section-count" id="tl-count"></span>
+    <button class="drop-btn" id="tl-expand-all-btn">EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span></button>
   </div>
+  <div class="tl-header-spacer"></div>
   <div class="timeline-wrap" id="timeline-wrap">
     <div class="timeline-spine"></div>
     <div class="timeline-spine-glow"></div>
@@ -1015,6 +1026,36 @@ function closeDropdowns() {
   document.getElementById("status-chevron").classList.remove("open");
 }
 
+// ── EXPAND / COLLAPSE ALL ────────────────────────────────────────────────────
+let collectionAllExpanded = false;
+let timelineAllExpanded = false;
+
+document.getElementById("expand-all-btn").addEventListener("click", () => {
+  collectionAllExpanded = !collectionAllExpanded;
+  GRADE_ORDER.forEach(g => { collapsed[g] = !collectionAllExpanded; });
+  renderRegistry();
+  const btn = document.getElementById("expand-all-btn");
+  btn.innerHTML = collectionAllExpanded
+    ? 'COLLAPSE ALL <span style="font-size:8px;opacity:0.7;">&#9650;</span>'
+    : 'EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span>';
+});
+
+document.getElementById("tl-expand-all-btn").addEventListener("click", () => {
+  timelineAllExpanded = !timelineAllExpanded;
+  // Update tlCollapsed state for all years
+  const years = [...new Set(kits.map(k => k.year))];
+  years.forEach(y => { tlCollapsed[y] = !timelineAllExpanded; });
+  // Apply to DOM
+  document.querySelectorAll(".tl-node-row").forEach(row => row.classList.toggle("open", timelineAllExpanded));
+  document.querySelectorAll(".tl-kit-panel").forEach(panel => panel.classList.toggle("open", timelineAllExpanded));
+  const btn = document.getElementById("tl-expand-all-btn");
+  btn.innerHTML = timelineAllExpanded
+    ? 'COLLAPSE ALL <span style="font-size:8px;opacity:0.7;">&#9650;</span>'
+    : 'EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span>';
+});
+
+
+
 // ── REGISTRY RENDER ──────────────────────────────────────────────────────────
 function renderRegistry() {
   const filtered = kits.filter(k => {
@@ -1056,6 +1097,16 @@ function renderRegistry() {
       collapsed[grade] = !collapsed[grade];
       list.classList.toggle("hidden", collapsed[grade]);
       header.querySelector(".grade-chevron").classList.toggle("open", !collapsed[grade]);
+      // Sync the expand-all button label
+      const allExp = GRADE_ORDER.every(g => !collapsed[g]);
+      const allCol = GRADE_ORDER.every(g => collapsed[g]);
+      if (allExp || allCol) {
+        collectionAllExpanded = allExp;
+        const btn = document.getElementById("expand-all-btn");
+        btn.innerHTML = collectionAllExpanded
+          ? 'COLLAPSE ALL <span style="font-size:8px;opacity:0.7;">&#9650;</span>'
+          : 'EXPAND ALL <span style="font-size:8px;opacity:0.7;">&#9660;</span>';
+      }
     });
 
     items.forEach(kit => {
